@@ -1,8 +1,8 @@
 import type { AppConfig } from '../types/config';
 
 export const CFG: AppConfig = {
-  imgDir: '/images/',
-  musicDir: '/music/',
+  imgDir: `${import.meta.env.BASE_URL}images/`,
+  musicDir: `${import.meta.env.BASE_URL}music/`,
   flipThreshold: 0.35,
   flipDuration: 580,
   snapDuration: 250,
@@ -144,8 +144,8 @@ export const ROMANTIC_PHRASES: string[] = [
 ];
 
 export const IMAGE_COUNT = IMAGES.length;
-const SPREAD_LETTER_START = 1;
-const SPREAD_LETTER_COUNT = 4;
+export const SPREAD_LETTER_START = 1;
+export const SPREAD_LETTER_COUNT = 4;
 export const SPREAD_MOVIE_START = SPREAD_LETTER_START + SPREAD_LETTER_COUNT;
 export const SPREAD_MOVIE_COUNT = 3;
 export const SPREAD_IMAGE_START = SPREAD_MOVIE_START + SPREAD_MOVIE_COUNT;

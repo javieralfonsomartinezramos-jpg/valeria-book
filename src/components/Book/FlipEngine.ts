@@ -273,11 +273,6 @@ function bindFlipEvents(): void {
   document.addEventListener('pointercancel', onUp);
 }
 
-export function animateEntrance(el: HTMLElement): void {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  gsap.fromTo(el, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' });
-}
-
 export function animatePageContent(container: HTMLElement): void {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const children = Array.from(container.children).filter(

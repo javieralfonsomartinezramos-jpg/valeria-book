@@ -42,6 +42,7 @@ export class Sidebar {
     sb.hidden = !this.open;
 
     if (this.open) {
+      this.buildIndex();
       this.prevFocus = document.activeElement as HTMLElement;
       this.releaseFocus = FocusTrap.trap(sb, document.getElementById('sidebar-close'));
     } else {

@@ -6,14 +6,22 @@
   align-items: center;
   justify-content: center;
   background: var(--portal-bg);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s;
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  transition: opacity 1.2s var(--ease-in-out), transform 1.2s var(--ease-in-out), visibility 1.2s;
+}
+
+.portal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+  pointer-events: none;
 }
 
 .portal.hidden {
   opacity: 0;
-  transform: scale(1.08);
+  transform: scale(1.12);
   visibility: hidden;
   pointer-events: none;
 }
@@ -27,38 +35,39 @@
 .portal-bg-glow {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.3;
+  filter: blur(100px);
+  opacity: 0.25;
 }
 
 .pg1 {
-  width: 400px; height: 400px;
+  width: 500px; height: 500px;
   background: var(--rose);
-  top: -10%; left: -5%;
-  animation: breathe 6s ease-in-out infinite;
+  top: -15%; left: -10%;
+  animation: breathe 7s ease-in-out infinite;
 }
 
 .pg2 {
-  width: 300px; height: 300px;
+  width: 400px; height: 400px;
   background: var(--mauve);
-  bottom: -8%; right: -5%;
-  animation: breathe 8s ease-in-out infinite 2s;
+  bottom: -12%; right: -10%;
+  animation: breathe 9s ease-in-out infinite 2s;
 }
 
 .pg3 {
-  width: 200px; height: 200px;
+  width: 250px; height: 250px;
   background: var(--coral);
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  animation: breathe 7s ease-in-out infinite 1s;
+  animation: breathe 8s ease-in-out infinite 1s;
 }
 
 .portal-content {
   position: relative;
+  z-index: 1;
   text-align: center;
-  max-width: 420px;
+  max-width: 440px;
   padding: var(--space-xl);
-  animation: portalFadeIn 1.2s ease both;
+  animation: portalFadeIn 1.8s var(--ease-out) both;
 }
 
 .portal-heart-wrap {
@@ -69,8 +78,8 @@
   font-size: var(--text-3xl);
   color: var(--rose);
   display: inline-block;
-  animation: float 3s ease-in-out infinite;
-  filter: drop-shadow(0 0 20px var(--rose-glow));
+  animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px var(--rose-glow));
 }
 
 .portal-title {
@@ -78,13 +87,17 @@
   font-size: var(--text-xl);
   margin-bottom: var(--space-md);
   color: var(--ink);
+  letter-spacing: 0.02em;
 }
 
 .portal-sub {
   font-size: var(--text-sm);
   color: var(--muted);
-  line-height: 1.7;
+  line-height: 1.8;
   margin-bottom: var(--space-xl);
+  max-width: 32em;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .portal-btn {
@@ -96,19 +109,25 @@
   background: linear-gradient(135deg, var(--rose), var(--coral));
   color: #fff;
   border: none;
-  transition: transform 0.3s var(--ease-spring), box-shadow 0.3s;
-  box-shadow: 0 4px 20px var(--rose-glow);
+  cursor: pointer;
+  transition: transform 0.4s var(--ease-spring), box-shadow 0.4s;
+  box-shadow: 0 4px 24px var(--rose-glow);
+  letter-spacing: 0.03em;
 }
 
 .portal-btn:hover {
-  transform: scale(1.04);
-  box-shadow: 0 6px 30px rgba(242, 139, 158, 0.3);
+  transform: scale(1.06);
+  box-shadow: 0 6px 36px rgba(242, 139, 158, 0.35);
+}
+
+.portal-btn:active {
+  transform: scale(0.97);
 }
 
 .portal-hint {
-  margin-top: var(--space-md);
+  margin-top: var(--space-lg);
   font-size: var(--text-xs);
   color: var(--muted);
-  opacity: 0.6;
+  opacity: 0.4;
   animation: float 3s ease-in-out infinite 1s;
 }

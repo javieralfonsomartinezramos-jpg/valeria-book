@@ -1,0 +1,18 @@
+{
+  "name": "Valeria's Book — Una historia de amor",
+  "short_name": "Valeria's Book",
+  "description": "Un libro digital interactivo dedicado a Valeria. Una carta de amor convertida en páginas.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0f0a0d",
+  "theme_color": "#0f0a0d",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

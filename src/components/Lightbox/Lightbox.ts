@@ -89,6 +89,8 @@ export class Lightbox {
     const lbImg = document.getElementById('lb-img') as HTMLImageElement | null;
     const lbLoader = document.getElementById('lb-loading');
     if (!lbImg) return;
+    lbImg.onerror = null;
+    lbImg.onload = null;
     lbImg.classList.add('loading');
     if (lbLoader) lbLoader.hidden = false;
     lbImg.onerror = function() {

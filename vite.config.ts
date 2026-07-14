@@ -4,7 +4,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? './' : '/',
   root: '.',
   publicDir: 'public',
   build: {
@@ -36,4 +37,4 @@ export default defineConfig({
     port: 3000,
     open: true,
   },
-});
+}));

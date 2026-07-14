@@ -28,6 +28,7 @@ export class AudioManager {
     }
     this.bindAudioEvents();
     this.restoreState();
+    this.setupMediaSession();
   }
 
   static play(idx: number, fromError?: boolean): void {
@@ -110,6 +111,34 @@ export class AudioManager {
   static getIsPlaying(): boolean { return this.isPlaying; }
   static getIsMuted(): boolean { return this.isMuted; }
 
+  private static setupMediaSession(): void {
+    if (!('mediaSession' in navigator)) return;
+    navigator.mediaSession.setActionHandler('play', () => this.toggle());
+    navigator.mediaSession.setActionHandler('pause', () => this.toggle());
+    navigator.mediaSession.setActionHandler('previoustrack', () => this.prev());
+    navigator.mediaSession.setActionHandler('nexttrack', () => this.next());
+    navigator.mediaSession.setActionHandler('seekforward', () => {
+      if (this.audio) this.audio.currentTime = Math.min(this.audio.currentTime + 10, this.audio.duration || 0);
+    });
+    navigator.mediaSession.setActionHandler('seekbackward', () => {
+      if (this.audio) this.audio.currentTime = Math.max(this.audio.currentTime - 10, 0);
+    });
+  }
+
+  private static updateMediaSession(): void {
+    if (!('mediaSession' in navigator) || this.currentIdx < 0) return;
+    const title = cleanLabel(MUSIC[this.currentIdx]);
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title,
+      artist: 'Valeria\'s Book',
+      album: 'Nuestra música',
+      artwork: [
+        { src: `${CFG.imgDir}../favicon.svg`, sizes: '64x64', type: 'image/svg+xml' },
+      ],
+    });
+    navigator.mediaSession.playbackState = this.isPlaying ? 'playing' : 'paused';
+  }
+
   private static bindAudioEvents(): void {
     if (!this.audio) return;
     const self = this;
@@ -117,6 +146,7 @@ export class AudioManager {
     this.audio.addEventListener('play', () => {
       self.isPlaying = true;
       self.updatePlayBtn();
+      self.updateMediaSession();
       if (self.rafId) cancelAnimationFrame(self.rafId);
       self.rafLoop();
       EventBus.emit('music:play-state', { isPlaying: true });
@@ -125,6 +155,7 @@ export class AudioManager {
     this.audio.addEventListener('pause', () => {
       self.isPlaying = false;
       self.updatePlayBtn();
+      self.updateMediaSession();
       if (self.rafId) { cancelAnimationFrame(self.rafId); self.rafId = 0; }
       self.debounceSave();
       EventBus.emit('music:play-state', { isPlaying: false });

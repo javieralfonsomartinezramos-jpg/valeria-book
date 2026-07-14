@@ -70,9 +70,19 @@
   }
 }
 
+.is-playing .mp-icon {
+  animation: discSpin 8s linear infinite;
+  will-change: transform;
+}
+
 .mp-art.has-art .mp-icon {
   opacity: 0;
   transform: scale(0.75);
+}
+
+@keyframes discSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 // ─── Equalizer ──────────────────────────────────────────────────

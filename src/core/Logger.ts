@@ -1,5 +1,3 @@
-import { EventBus } from './EventBus';
-
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 const ENABLED: Record<LogLevel, boolean> = {
@@ -25,7 +23,6 @@ export class Logger {
   static error(source: string, message: string, error?: unknown): void {
     if (!ENABLED.error) return;
     console.error(`${this.PREFIX}[${source}] ${message}`, error ?? '');
-    EventBus.emit('error:occurred', { source, message, error });
   }
 
   static debug(source: string, message: string, ...args: unknown[]): void {

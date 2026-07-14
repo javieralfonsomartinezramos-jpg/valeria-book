@@ -6,29 +6,7 @@ import { initPageImages, createPageContent, setLightboxOpenFn } from './PageRend
 import { initFlipEngine, navigateWithFlip, getIsFlipping, animatePageContent } from './FlipEngine';
 import { getCurrentSpread, setCurrentSpread, getPageName, bindNavButtons, bindKeyboardNav, completeNavigation, updateNavButtons } from './BookUI';
 import { Lightbox } from '../Lightbox/Lightbox';
-
-interface BookElements {
-  psLeft: HTMLElement | null;
-  psRight: HTMLElement | null;
-  bodyL: HTMLElement | null;
-  bodyR: HTMLElement | null;
-  numL: HTMLElement | null;
-  numR: HTMLElement | null;
-  flip: HTMLElement | null;
-  fFront: HTMLElement | null;
-  fBack: HTMLElement | null;
-  fBodyF: HTMLElement | null;
-  fBodyB: HTMLElement | null;
-  fNumF: HTMLElement | null;
-  fNumB: HTMLElement | null;
-  fShadow: HTMLElement | null;
-  foldGrad: HTMLElement | null;
-  topbar: HTMLElement | null;
-  title: HTMLElement | null;
-  bmRibbon: HTMLElement | null;
-  bm: HTMLElement | null;
-  book: HTMLElement | null;
-}
+import type { BookElements } from '../../types/book';
 
 const DOM: BookElements = {
   psLeft: null, psRight: null, bodyL: null, bodyR: null,

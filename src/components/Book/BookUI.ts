@@ -1,4 +1,4 @@
-import { TOTAL_SPREADS, SPREAD_IMAGE_START, IMAGE_COUNT, SPREAD_MOVIE_START, SPREAD_MOVIE_COUNT, SPREAD_MUSIC, SPREAD_NOTES, SPREAD_CLOSING } from '../../config';
+import { TOTAL_SPREADS, SPREAD_LETTER_START, SPREAD_LETTER_COUNT, SPREAD_IMAGE_START, IMAGE_COUNT, SPREAD_MOVIE_START, SPREAD_MOVIE_COUNT, SPREAD_MUSIC, SPREAD_NOTES, SPREAD_CLOSING } from '../../config';
 import { EventBus } from '../../core/EventBus';
 import { Logger } from '../../core/Logger';
 import { navigateWithFlip, canGoNext, canGoPrev, getIsFlipping } from './FlipEngine';
@@ -25,8 +25,14 @@ export function completeNavigation(dir: number): void {
 
 export function getPageName(pageIndex: number): string {
   if (pageIndex <= 1) return 'Portada';
-  if (pageIndex <= 5) return 'Prologo';
-  if (pageIndex <= 7) return 'Cartas';
+  const letterStart = SPREAD_LETTER_START * 2;
+  const letterEnd = letterStart + SPREAD_LETTER_COUNT * 2;
+  if (pageIndex >= letterStart && pageIndex < letterEnd) {
+    const offset = pageIndex - letterStart;
+    if (offset < 4) return 'Prologo';
+    if (offset < 6) return 'Cartas';
+    return 'Cartas';
+  }
   const ms = SPREAD_MOVIE_START * 2;
   if (pageIndex >= ms && pageIndex < ms + SPREAD_MOVIE_COUNT * 2) return 'Nuestras peliculas';
   const isp = SPREAD_IMAGE_START * 2;

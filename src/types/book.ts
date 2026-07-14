@@ -4,12 +4,7 @@ export interface PageData {
   index: number;
 }
 
-export interface Chapter {
-  name: string;
-  spread: number;
-}
-
-export interface BookDOM {
+export interface BookElements {
   psLeft: HTMLElement | null;
   psRight: HTMLElement | null;
   bodyL: HTMLElement | null;
