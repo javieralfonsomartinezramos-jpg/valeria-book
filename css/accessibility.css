@@ -1,0 +1,36 @@
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+[aria-disabled="true"] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+[data-theme="highcontrast"] {
+  --bg: #000;
+  --bg-soft: #111;
+  --ink: #fff;
+  --muted: rgba(255, 255, 255, 0.8);
+  --rose: #ff6b8a;
+  --page-bg: #fff;
+  --page-ink: #000;
+  --page-muted: rgba(0, 0, 0, 0.6);
+  --portal-bg: rgba(0, 0, 0, 0.97);
+}
