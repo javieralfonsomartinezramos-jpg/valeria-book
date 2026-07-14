@@ -34,7 +34,7 @@ export function getPageName(pageIndex: number): string {
     return 'Cartas';
   }
   const ms = SPREAD_MOVIE_START * 2;
-  if (pageIndex >= ms && pageIndex < ms + SPREAD_MOVIE_COUNT * 2) return 'Nuestras peliculas';
+  if (pageIndex >= ms && pageIndex < ms + SPREAD_MOVIE_COUNT * 2) return 'Nuestras películas';
   const isp = SPREAD_IMAGE_START * 2;
   const iep = isp + IMAGE_COUNT * 2;
   if (pageIndex >= isp && pageIndex < iep) return (pageIndex % 2 === 0) ? 'Nuestros recuerdos' : 'Gracias';

@@ -45,7 +45,7 @@ export interface MovieQuote {
 }
 
 export const MOVIE_QUOTES: MovieQuote[] = [
-  { film: 'Enredados', char: 'Flynn Rider', quote: '"Sabia quien era realmente el dia que deje todo atras para estar contigo. Tu eras mi nuevo sueno."' },
+  { film: 'Enredados', char: 'Flynn Rider', quote: '"Sabía quién era realmente el día que dejé todo atrás para estar contigo. Tú eras mi nuevo sueño."' },
   { film: 'Princesa y el sapo', char: 'Prince Naveen', quote: '"Tiana, eres mi estrella Evangeline, la unica que brilla en mi cielo."' },
   { film: 'La bella y la bestia', char: 'Bestia', quote: '"Ella me miro de una manera que nadie me habia mirado antes."' },
   { film: 'La sirenita', char: 'Ariel', quote: '"Que daria yo por estar alli, en ese mundo del que tanto he sonado?"' },
@@ -57,7 +57,7 @@ export const CHAPTERS: { name: string; spread: number }[] = [
   { name: 'Portada', spread: 0 },
   { name: 'Prologo', spread: 1 },
   { name: 'Lo que veo en ti', spread: 2 },
-  { name: 'Nuestras peliculas', spread: 5 },
+  { name: 'Nuestras películas', spread: 5 },
   { name: 'Nuestros recuerdos', spread: 8 },
   { name: 'Nuestra música', spread: 14 },
   { name: 'Dedicatoria y notas', spread: 15 },

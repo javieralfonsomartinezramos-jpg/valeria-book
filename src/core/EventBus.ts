@@ -14,6 +14,10 @@ export class EventBus {
     this.listeners.get(event)?.delete(callback as EventCallback);
   }
 
+  static offAll<K extends EventName>(event: K): void {
+    this.listeners.delete(event);
+  }
+
   static emit<K extends EventName>(event: K, data?: EventMap[K]): void {
     const cbs = this.listeners.get(event);
     if (!cbs) return;

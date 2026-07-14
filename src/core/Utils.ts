@@ -40,6 +40,8 @@ const SPANISH_FIXES: [RegExp, string][] = [
   [/\bpagina\b/g, 'página'],
   [/\bEmocion\b/g, 'Emoción'],
   [/\bemocion\b/g, 'emoción'],
+  [/\bPeliculas\b/g, 'Películas'],
+  [/\bpeliculas\b/g, 'películas'],
   [/\bPelicula\b/g, 'Película'],
   [/\bpelicula\b/g, 'película'],
   [/\bSueno\b/g, 'Sueño'],
