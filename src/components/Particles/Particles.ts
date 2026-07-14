@@ -15,6 +15,7 @@ interface Particle {
 const particles: Particle[] = [];
 let container: HTMLElement | null = null;
 let running = false;
+let rafId = 0;
 
 function spawn(initial: boolean): void {
   if (!container) return;
@@ -62,7 +63,7 @@ function loop(): void {
     p.el.style.transform = `rotate(${p.rot}deg)`;
     p.el.style.opacity = String(p.y < 10 ? (p.y / 10) * 0.2 : p.y > 90 ? ((100 - p.y) / 10) * 0.2 : 0.08 + Math.random() * 0.12);
   }
-  requestAnimationFrame(loop);
+  rafId = requestAnimationFrame(loop);
 }
 
 export function startParticles(): void {
@@ -76,4 +77,10 @@ export function startParticles(): void {
   loop();
 }
 
-
+export function stopParticles(): void {
+  running = false;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+  particles.forEach(p => p.el.remove());
+  particles.length = 0;
+  if (container) { container.remove(); container = null; }
+}

@@ -807,7 +807,7 @@
 
 // ─── Top bar ───────────────────────────────────────────────────
 
-.topbar {
+#topbar {
   position: fixed;
   top: 0;
   left: 0;
@@ -829,7 +829,7 @@
   transition: opacity 0.5s;
 }
 
-.topbar:not([hidden]) .topbar-title {
+#topbar:not([hidden]) .topbar-title {
   opacity: 1;
 }
 
@@ -837,20 +837,4 @@
   display: flex;
   gap: var(--space-xxs);
   pointer-events: auto;
-}
-
-.top-btn {
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: var(--muted);
-  transition: background var(--dur), color var(--dur);
-}
-
-.top-btn:hover {
-  background: var(--rose-glow);
-  color: var(--rose);
 }

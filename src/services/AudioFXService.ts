@@ -48,7 +48,9 @@ export class AudioFXService {
       noise.connect(gain);
       noise.start(now);
       noise.stop(now + 0.06);
-    } catch { /* silent */ }
+    } catch (err) {
+      Logger.error('AudioFXService', 'Failed to play page-turn sound', err);
+    }
   }
 
   private static updateBtn(): void {

@@ -3,10 +3,10 @@ import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const base = process.env.BASE_URL || (process.env.NODE_ENV === 'production' ? './' : '/');
+const repo = 'valeria-book';
 
-export default defineConfig({
-  base,
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? `/${repo}/` : '/',
   root: '.',
   publicDir: 'public',
   build: {
@@ -20,6 +20,7 @@ export default defineConfig({
         manualChunks: {
           gsap: ['gsap'],
           core: ['./src/core/EventBus.ts', './src/core/Logger.ts', './src/core/StorageManager.ts'],
+          audio: ['./src/services/AudioManager.ts'],
         },
       },
     },
@@ -38,4 +39,4 @@ export default defineConfig({
     port: 3000,
     open: true,
   },
-});
+}));

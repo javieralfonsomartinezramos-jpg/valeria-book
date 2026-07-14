@@ -94,8 +94,8 @@ export function initBook(): void {
   Logger.info('BookEngine', 'Initialized');
 }
 
-function onFlipNavigate(_dir: number): void {
-  completeNavigation();
+function onFlipNavigate(dir: number): void {
+  completeNavigation(dir);
   renderSpread();
   StorageManager.setSpread(getCurrentSpread());
   EventBus.emit('audiofx:page-turn');
