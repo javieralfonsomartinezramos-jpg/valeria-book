@@ -33,11 +33,13 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
-      - name: Build
-        run: npm run build
-
       - name: Setup Pages
         uses: actions/configure-pages@v4
+
+      - name: Build
+        run: npm run build
+        env:
+          BASE_URL: ${{ steps.configure-pages.outputs.base }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

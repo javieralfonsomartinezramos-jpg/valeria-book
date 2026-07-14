@@ -3,9 +3,10 @@ import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const base = process.env.BASE_URL || (process.env.NODE_ENV === 'production' ? './' : '/');
 
-export default defineConfig(({ mode }) => ({
-  base: mode === 'production' ? './' : '/',
+export default defineConfig({
+  base,
   root: '.',
   publicDir: 'public',
   build: {
@@ -37,4 +38,4 @@ export default defineConfig(({ mode }) => ({
     port: 3000,
     open: true,
   },
-}));
+});
