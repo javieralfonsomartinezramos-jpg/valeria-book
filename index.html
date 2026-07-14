@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valeria's Book — Una historia de amor</title>
+  <meta name="description" content="Un libro digital interactivo dedicado a Valeria. Una carta de amor convertida en páginas.">
+  <meta name="theme-color" content="#0f0a0d">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/styles/main.scss">
+</head>
+<body>
+
+  <div id="portal" class="portal" role="dialog" aria-label="Entrada al libro">
+    <div class="portal-bg" aria-hidden="true">
+      <div class="portal-bg-glow pg1"></div>
+      <div class="portal-bg-glow pg2"></div>
+      <div class="portal-bg-glow pg3"></div>
+    </div>
+    <div class="portal-content">
+      <div class="portal-heart-wrap" aria-hidden="true">
+        <span class="portal-heart">&hearts;</span>
+      </div>
+      <p class="portal-title">Hay una historia escrita para ti...</p>
+      <p class="portal-sub">Un libro de recuerdos, canciones y palabras que esperan ser descubiertas. ¿La abrimos juntos?</p>
+      <button class="portal-btn" id="portal-btn">Sí, quiero leerlo</button>
+      <p class="portal-hint">Toca para empezar</p>
+    </div>
+  </div>
+
+  <div id="loader" class="loader" role="progressbar" aria-label="Cargando" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+    <div class="loader-heart">&hearts;</div>
+    <div class="loader-bar-track">
+      <div class="loader-bar-fill" id="loader-fill" style="width:0%"></div>
+    </div>
+    <span class="loader-pct" id="loader-pct">0%</span>
+  </div>
+
+  <div id="app" aria-label="Valeria's Book">
+    <div class="ambient" aria-hidden="true">
+      <div class="ambient-glow g1"></div>
+      <div class="ambient-glow g2"></div>
+      <div class="ambient-glow g3"></div>
+      <div class="ambient-glow g4"></div>
+    </div>
+
+    <div id="bookmark" class="bookmark" role="progressbar" aria-label="Progreso de lectura" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      <div class="bookmark-ribbon" id="bm-ribbon"></div>
+    </div>
+
+    <header id="topbar" hidden>
+      <span class="topbar-title" id="topbar-title" aria-live="polite">Portada</span>
+      <nav class="topbar-actions" aria-label="Acciones">
+        <button class="top-btn" id="btn-index" aria-label="Abrir indice" title="Indice">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <button class="top-btn" id="btn-surprise" aria-label="Recuerdo sorpresa" title="Sorpresa">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </button>
+        <button class="top-btn" id="btn-contrast" aria-label="Alternar alto contraste" title="Alto contraste">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z"/></svg>
+        </button>
+        <button class="top-btn" id="btn-sound" aria-label="Sonido de páginas" title="Sonido">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        </button>
+      </nav>
+    </header>
+
+    <aside id="sidebar" role="navigation" aria-label="Indice del libro" hidden>
+      <div class="sidebar-head">
+        <h2>Contenido</h2>
+        <button id="sidebar-close" aria-label="Cerrar indice">&times;</button>
+      </div>
+      <ul id="index-list" class="index-list"></ul>
+    </aside>
+
+    <div class="book-wrapper">
+      <div class="book-container">
+        <div class="book-edge-left" aria-hidden="true">
+          <div class="edge-pages"></div>
+        </div>
+
+        <main class="book" id="book" aria-label="Libro interactivo">
+
+          <div class="book-cover-front" aria-hidden="true">
+            <div class="cover-emboss">
+              <span class="cover-heart">&hearts;</span>
+              <span class="cover-title">Valeria's Book</span>
+              <span class="cover-subtitle">Para Valeria, con todo mi amor</span>
+            </div>
+          </div>
+
+          <div class="spine spine-center" aria-hidden="true"></div>
+          <div class="spine spine-l" aria-hidden="true"></div>
+          <div class="spine spine-r" aria-hidden="true"></div>
+          <div class="book-shadow" aria-hidden="true"></div>
+
+          <div class="page-slot ps-left" id="ps-left">
+            <article class="page-surf" id="pg-left">
+              <div class="pg-body" id="body-left"></div>
+              <span class="pg-num" id="num-left"></span>
+            </article>
+          </div>
+          <div class="page-slot ps-right" id="ps-right">
+            <article class="page-surf" id="pg-right">
+              <div class="pg-body" id="body-right"></div>
+              <span class="pg-num" id="num-right"></span>
+            </article>
+          </div>
+
+          <div class="flip-page" id="flip-page" hidden>
+            <div class="flip-face f-front" id="f-front">
+              <div class="pg-body" id="f-body-f"></div>
+              <span class="pg-num" id="f-num-f"></span>
+            </div>
+            <div class="flip-face f-back" id="f-back">
+              <div class="pg-body" id="f-body-b"></div>
+              <span class="pg-num" id="f-num-b"></span>
+            </div>
+            <div class="flip-shadow" id="f-shadow" aria-hidden="true"></div>
+            <div class="fold-gradient" id="fold-gradient" aria-hidden="true"></div>
+          </div>
+
+          <div id="templates" hidden>
+            <template data-page="0">
+              <div class="p-cover-spread">
+                <span class="p-cover-heart" aria-hidden="true">&hearts;</span>
+                <h1 class="p-cover-title">Valeria's Book</h1>
+                <p class="p-cover-sub">Para Valeria, con todo mi amor</p>
+                <time class="p-cover-date">&mdash; 2026 &mdash;</time>
+              </div>
+            </template>
+
+            <template data-page="1">
+              <div class="p-letter">
+                <p>Mi amor,</p>
+                <p>no sé cómo poner en palabras todo lo que siento por ti, porque siento que ninguna es suficiente para describir lo mucho que te amo.</p>
+                <p>Llegaste a mi vida de una forma tan bonita que, sin darme cuenta, te convertiste en mi lugar seguro, en la persona que alegra mis días y calma mi corazón incluso estando lejos.</p>
+                <p>Gracias por cada detalle, por cada mensaje, por hacerme sentir querida y por demostrarme que el amor también se construye con paciencia, respeto y cariño.</p>
+              </div>
+            </template>
+
+            <template data-page="2">
+              <div class="p-letter">
+                <p>No sabes lo feliz que soy de tenerte, y si algún día llegas a dudar de cuánto significas para mí, quiero que recuerdes esto: te elegiría una y otra vez, en cualquier momento y en cualquier lugar.</p>
+                <p>Eres una de las personas más especiales que han llegado a mi vida y prometo cuidar de tu corazón como tú has cuidado del mío.</p>
+                <p>Te amo más de lo que las palabras pueden explicar, mi amor, y espero que nunca olvides que siempre tendrás un hogar en mi corazón.</p>
+                <p class="p-signature">&mdash; Con todo mi amor, Valeria</p>
+              </div>
+            </template>
+
+            <template data-page="3">
+              <div class="p-letter">
+                <p>&mdash; Lo que veo en ti &mdash;</p>
+                <p>A veces me pregunto si de verdad sabes todo lo que veo cuando pienso en ti. No es solo que me parezcas hermosa, aunque lo eres, sino que hay algo en tu forma de ser que me hace admirarte cada día un poco más.</p>
+                <p>Me gusta la manera en que hablas, cómo ves las cosas y cómo consigues que una conversación cualquiera termine siendo uno de los mejores momentos de mi día. Contigo todo se siente más ligero, como si por un rato el resto del mundo dejara de importar.</p>
+                <p>Me gusta que seas tú, sin intentar parecer alguien más, porque justamente esa autenticidad fue lo que hizo que empezara a fijarme en ti.</p>
+              </div>
+            </template>
+
+            <template data-page="4">
+              <div class="p-letter">
+                <p>Hay personas que llegan y pasan sin dejar mucho, pero contigo fue diferente. Poco a poco te fuiste convirtiendo en alguien que ocupa un lugar muy importante en mi vida. Sin darme cuenta empecé a esperar tus mensajes, a sonreír cuando veía tu nombre en la pantalla y a querer contarte cualquier cosa que me pasara.</p>
+                <p>Es curioso cómo alguien puede cambiar tantos días con algo tan simple como una conversación. También me gusta pensar en todo lo que todavía no hemos vivido. Imagino caminatas sin un rumbo fijo, tardes escuchando música, viendo películas, riéndonos por cualquier tontería o simplemente disfrutando del silencio sin que se vuelva incómodo.</p>
+                <p>No sueño con una vida perfecta porque sé que eso no existe; sueño con una vida donde estemos juntos, aprendiendo, creciendo y eligiéndonos una y otra vez.</p>
+              </div>
+            </template>
+
+            <template data-page="5">
+              <div class="p-letter">
+                <p>Si alguna vez me preguntaran por qué eres tan especial para mí, probablemente no sabría responder con una sola razón. Eres un montón de pequeños detalles que, cuando se juntan, hacen que seas completamente única. Tu forma de hacerme sentir, de escucharme, de entenderme y de estar ahí vale muchísimo para mí.</p>
+                <p>Y aunque a veces me cuesta encontrar las palabras correctas, quiero que nunca dudes de algo: desde que llegaste, mi vida se siente mucho más bonita.</p>
+                <blockquote class="p-quote">
+                  <p>&ldquo;No te amo como si fueras rosa de sal, topacio o flecha de claveles que propagan el fuego: te amo como se aman ciertas cosas oscuras, secretamente, entre la sombra y el alma.&rdquo;</p>
+                  <cite>&mdash; Pablo Neruda, Soneto XVII</cite>
+                </blockquote>
+                <p>A usted le tengo un miedo inmenso de perderla y de perderme en el proceso porque sinceramente no sé qué sería de mí si algún día eso llegara a pasar; es que usted se convirtió en mi tranquilidad, en mi felicidad y en la persona con la que quiero compartir todo lo bueno y también lo malo.</p>
+              </div>
+            </template>
+
+            <template data-page="6">
+              <div class="p-letter">
+                <p>Yo la amo muchísimo más de lo que mis palabras pueden explicar, y aunque intente demostrarlo siento que nunca es suficiente, porque usted merece muchísimo más de lo que yo puedo darle, pero aún así quiero seguir esforzándome cada día para hacerla sentir tan amada como usted me hace sentir a mí, porque usted es mi lugar favorito y la persona más importante de mi vida.</p>
+                <p>También quiero decirle que para mí usted es la mujer más hermosa que existe y no hay un solo día en el que no piense eso; cada vez que la veo siento que el mundo se detiene un momento porque su sonrisa, sus ojos, su forma de ser y hasta esos pequeños detalles que tal vez usted no nota son las cosas que más me enamoran de usted.</p>
+                <p>Quien alguna vez le hizo creer que usted no era hermosa simplemente no sabe apreciar la belleza de verdad, porque yo la veo y no encuentro un solo defecto, solo encuentro razones para seguir enamorándome más.</p>
+              </div>
+            </template>
+
+            <template data-page="7">
+              <div class="p-letter">
+                <p>Yo voy a intentar dar absolutamente todo de mí porque no quiero que algún día piense que me faltó amarla o demostrarle lo importante que es para mí. Quiero aprender de mis errores, mejorar por usted y por nosotros, porque lo único que deseo es seguir caminando a su lado.</p>
+                <p>Solo le pido que no me deje rendirme, que no me suelte la mano si en algún momento me equivoco, porque jamás habrá un error que signifique que la amo menos; al contrario, cada día que pasa descubro nuevas razones para elegirla otra vez y otra vez.</p>
+                <p>Y perdón si me disculpo demasiado, es que a veces mi cabeza me juega en contra y siento que la estoy molestando o que mi manera de actuar no siempre es la mejor; entonces empiezo a pensar demasiado y termino creyendo cosas que probablemente ni siquiera son verdad, pero prefiero pedirle perdón antes que hacerla sentir mal.</p>
+                <p>Y por favor, nunca dude de lo que siento, porque la amo con todo lo que soy y con todo lo que tengo, y la voy a seguir amando cada día un poquito más aunque pase el tiempo.</p>
+                <p class="p-signature">&mdash; Javi</p>
+              </div>
+            </template>
+
+            <template data-name="thanks-page">
+              <div class="p-thanks-full">
+                <div class="thanks-full-deco" aria-hidden="true">
+                  <span class="thanks-full-star">&#10022;</span>
+                  <span class="thanks-full-star">&#10022;</span>
+                  <span class="thanks-full-star">&#10022;</span>
+                </div>
+                <p class="thanks-full-title">Gracias</p>
+                <p class="thanks-full-text">No s&eacute; muy bien por d&oacute;nde empezar, porque las palabras a veces se quedan cortas cuando se trata de agradecer a alguien que ha cambiado tu vida por completo. Pero si hay algo que tengo claro es que cada d&iacute;a a tu lado es un motivo m&aacute;s para sentirme afortunado.</p>
+                <p class="thanks-full-text">Gracias por tu sonrisa, esa que ilumina hasta los d&iacute;as m&aacute;s grises y que me recuerda que la felicidad existe en los peque&ntilde;os momentos. Gracias por tu forma de ver la vida, por tu sensibilidad, por tu forma de dibujar emociones en cada trazo y de convertir lo ordinario en extraordinario.</p>
+                <p class="thanks-full-text">Admiro tu talento, tu dedicaci&oacute;n, tu forma de esforzarte por lo que amas sin rendirte. Admiro tu inteligencia, tu creatividad, tu manera de hacer sentir especiales a quienes te rodean. No conozco a nadie que tenga tu capacidad para sacar sonrisas incluso en los d&iacute;as dif&iacute;ciles, ni a nadie que haga que los momentos simples se conviertan en recuerdos inolvidables.</p>
+                <p class="thanks-full-text">Gracias por ser como eres. Por tu ternura, tu paciencia, tu forma de cuidar sin esperar nada a cambio. Gracias por cada mensaje, cada llamada, cada detalle. Gracias por estar ah&iacute;, incluso cuando la distancia se hace notar.</p>
+                <p class="thanks-full-text">Estoy orgulloso de ti. Orgulloso de la persona que eres, de todo lo que construyes, de c&oacute;mo enfrentas la vida con valent&iacute;a y amor. Y ojal&aacute; pudieras verte a trav&eacute;s de mis ojos aunque solo fuera un segundo, para que supieras lo hermosa, valiosa e incre&iacute;ble que eres.</p>
+                <p class="thanks-full-text">Gracias por existir. Por cruzarte en mi camino. Por quedarte. Por hacer que mi vida sea mucho m&aacute;s bonita desde que llegaste. Te admiro, te respeto y te amo m&aacute;s de lo que las palabras pueden expresar.</p>
+                <p class="thanks-full-signature">&mdash; Con todo mi amor, Javi</p>
+                <div class="thanks-full-deco thanks-full-deco--bottom" aria-hidden="true">
+                  <span class="thanks-full-heart">&hearts;</span>
+                </div>
+              </div>
+            </template>
+            <template data-name="music">
+              <div class="p-music">
+                <div class="mp-now">
+                  <div class="mp-art" id="mp-art">
+                    <img class="mp-art-img" id="mp-art-img" src="" alt="" aria-hidden="true" hidden>
+                    <div class="mp-icon" id="mp-icon" aria-hidden="true">
+                      <svg viewBox="0 0 48 48" width="48" height="48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                          <radialGradient id="vg" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#c97a6a" stop-opacity="0.08"/>
+                            <stop offset="50%" stop-color="#a04030" stop-opacity="0.04"/>
+                            <stop offset="100%" stop-color="#2c1810" stop-opacity="0.02"/>
+                          </radialGradient>
+                        </defs>
+                        <circle cx="24" cy="24" r="20" fill="url(#vg)" stroke="currentColor" stroke-width="1" opacity="0.15"/>
+                        <circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="0.5" opacity="0.08"/>
+                        <circle cx="24" cy="24" r="3" fill="currentColor" opacity="0.12"/>
+                        <path d="M20 30V16l14-1.5v13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="16" cy="30" r="3.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+                        <circle cx="34" cy="27.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+                      </svg>
+                    </div>
+                    <div class="mp-eq" id="mp-eq" hidden aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+                  </div>
+                  <div class="mp-info">
+                    <p class="mp-track" id="mp-track">Selecciona una canción</p>
+                    <p class="mp-artist" id="mp-artist"></p>
+                  </div>
+                </div>
+                <div class="mp-extra-row">
+                  <button class="mp-btn mp-toggle" id="mp-shuffle" aria-label="Aleatorio" title="Aleatorio">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+                  </button>
+                  <div class="mp-ctrls">
+                    <button class="mp-btn" id="mp-prev" aria-label="Canción anterior"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                    <button class="mp-btn mp-play" id="mp-play" aria-label="Reproducir"><svg id="mp-picon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+                    <button class="mp-btn" id="mp-next" aria-label="Canción siguiente"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+                  </div>
+                  <button class="mp-btn mp-toggle" id="mp-repeat" aria-label="Modo repetición" title="Repetir">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                  </button>
+                </div>
+                <div class="mp-prog-wrap">
+                  <input type="range" class="mp-prog" id="mp-prog" min="0" max="100" value="0" step="0.1" aria-label="Progreso de reproducción">
+                  <div class="mp-times"><span id="mp-cur">0:00</span><span id="mp-tot">0:00</span></div>
+                </div>
+                <div class="mp-vol-wrap">
+                  <button class="mp-btn mp-btn-sm" id="mp-mute" aria-label="Silenciar"><svg class="mp-vicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" id="mp-vpath"/></svg></button>
+                  <input type="range" class="mp-vol" id="mp-vol" min="0" max="1" step="0.01" value="1" aria-label="Volumen">
+                </div>
+                <div class="mp-queue" id="mp-queue"></div>
+              </div>
+            </template>
+
+            <template data-name="notes">
+              <div class="p-final">
+                <section class="final-ded">
+                  <p>Y así cerramos este libro, pero no nuestra historia.</p>
+                  <p>Cada página escrita aquí es un reflejo de lo que siento por ti, Valeria.</p>
+                  <p>Gracias por llenar mis días de luz, por ser mi inspiración y mi paz.</p>
+                  <p>Esto no es un adiós, es un hasta luego &mdash; porque siempre habrá más capítulos por escribir.</p>
+                  <p>Te amo, hoy, mañana y siempre.</p>
+                  <p class="p-signature">&mdash; Javi</p>
+                </section>
+                <hr class="final-hr" aria-hidden="true">
+                <section class="final-notes">
+                  <p class="notes-intro">Escribe aquí tus pensamientos, como anotando en los márgenes...</p>
+                  <textarea class="notes-ta" id="notes-ta" placeholder="Escribe algo bonito..." aria-label="Notas personales"></textarea>
+                  <button class="btn-sec" id="notes-save">Guardar nota</button>
+                  <div class="notes-list" id="notes-list"></div>
+                </section>
+                <hr class="final-hr" aria-hidden="true">
+                <section class="g-favs" id="g-favs" hidden>
+                  <h3 class="g-favs-title">&hearts; Tus favoritas</h3>
+                  <div class="g-favs-grid" id="g-favs-grid"></div>
+                </section>
+              </div>
+            </template>
+
+            <template data-name="closing">
+              <div class="p-close">
+                <div class="close-decoration" aria-hidden="true">
+                  <span class="close-star">&#10022;</span>
+                  <span class="close-star">&#10022;</span>
+                  <span class="close-star">&#10022;</span>
+                </div>
+                <div class="close-content">
+                  <p class="close-line">Y as&iacute;, entre fotos, canciones y palabras, este libro sigue escribi&eacute;ndose&hellip;</p>
+                  <p class="close-sub">Cada p&aacute;gina que giraste fue un latido. Cada imagen, un recuerdo. Cada canci&oacute;n, un pedacito de nosotros.</p>
+                  <p class="close-sub">Esto no es un final. Es solo el principio de todo lo que todav&iacute;a nos queda por vivir.</p>
+                  <p class="close-sub">Gracias por existir, por quedarte y por hacer que cada d&iacute;a valga la pena.</p>
+                  <p class="close-sub">Te amo. Hoy, ma&ntilde;ana y siempre.</p>
+                  <p class="close-sub close-signature">&mdash; Con todo mi amor, Javi</p>
+                </div>
+                <div class="close-end-wrap">
+                  <span class="close-end-label">Fin</span>
+                  <span class="close-end-heart" aria-hidden="true">&hearts;</span>
+                </div>
+                <div class="close-petals" id="close-petals" aria-hidden="true"></div>
+              </div>
+            </template>
+          </div>
+        </main>
+
+        <div class="book-edge-right" aria-hidden="true">
+          <div class="edge-pages"></div>
+        </div>
+      </div>
+
+      <button class="book-nav book-nav-prev" id="nav-prev" aria-label="Página anterior" title="Anterior">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="book-nav book-nav-next" id="nav-next" aria-label="Página siguiente" title="Siguiente">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <div id="lightbox" class="lightbox" role="dialog" aria-label="Visor de imagenes" hidden>
+      <div class="lb-bg"></div>
+      <div class="lb-inner">
+        <button class="lb-close" id="lb-close" aria-label="Cerrar visor">&times;</button>
+        <button class="lb-nav lb-prev" id="lb-prev" aria-label="Imagen anterior">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="lb-loading" id="lb-loading" aria-hidden="true"></div>
+        <img class="lb-img" id="lb-img" src="" alt="Fotografia">
+        <button class="lb-nav lb-next" id="lb-next" aria-label="Imagen siguiente">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <span class="lb-counter" id="lb-counter" aria-live="polite"></span>
+        <button class="lb-fav" id="lb-fav" aria-label="Añadir favorita">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <audio id="audio" preload="metadata" aria-hidden="true"></audio>
+    <audio id="sfx" preload="auto" aria-hidden="true"></audio>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
