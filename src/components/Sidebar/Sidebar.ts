@@ -3,7 +3,7 @@ import { sanitize } from '../../core/Utils';
 import { FocusTrap } from '../../ui/FocusTrap';
 import { Logger } from '../../core/Logger';
 import { goToSpread } from '../Book/BookEngine';
-import { getCurrentSpread } from '../Book/BookUI';
+import { getCurrentSpread } from '../../core/BookState';
 
 export class Sidebar {
   private static open = false;

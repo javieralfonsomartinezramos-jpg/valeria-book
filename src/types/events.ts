@@ -1,5 +1,7 @@
 export type EventMap = {
   'book:page-changed': { spread: number; total: number; isMobile: boolean };
+  'book:will-navigate': { from: number; to: number; dir: number };
+  'book:navigated': { spread: number };
   'book:navigate': { spread: number; animated: boolean };
 
   'music:track-changed': { index: number; title: string };

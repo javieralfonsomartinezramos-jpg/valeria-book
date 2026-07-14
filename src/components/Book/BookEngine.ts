@@ -2,9 +2,10 @@ import { TOTAL_SPREADS, SPREAD_MUSIC, SPREAD_NOTES, SPREAD_CLOSING } from '../..
 import { EventBus } from '../../core/EventBus';
 import { Logger } from '../../core/Logger';
 import { StorageManager } from '../../core/StorageManager';
+import { getCurrentSpread, setCurrentSpread, getIsFlipping, completeNavigation } from '../../core/BookState';
 import { initPageImages, createPageContent, setLightboxOpenFn } from './PageRenderer';
-import { initFlipEngine, navigateWithFlip, getIsFlipping, animatePageContent } from './FlipEngine';
-import { getCurrentSpread, setCurrentSpread, getPageName, bindNavButtons, bindKeyboardNav, completeNavigation, updateNavButtons } from './BookUI';
+import { initFlipEngine, navigateWithFlip } from './FlipEngine';
+import { getPageName, bindNavButtons, bindKeyboardNav, updateNavButtons } from './BookUI';
 import { Lightbox } from '../Lightbox/Lightbox';
 import type { BookElements } from '../../types/book';
 
@@ -93,8 +94,8 @@ export function initBook(): void {
   Logger.info('BookEngine', 'Initialized');
 }
 
-function onFlipNavigate(dir: number): void {
-  completeNavigation(dir);
+function onFlipNavigate(_dir: number): void {
+  completeNavigation();
   renderSpread();
   StorageManager.setSpread(getCurrentSpread());
   EventBus.emit('audiofx:page-turn');
@@ -113,8 +114,10 @@ export function renderSpread(): void {
     const content = createPageContent(showingIdx);
     if (DOM.bodyR) {
       DOM.bodyR.innerHTML = '';
-      if (content) DOM.bodyR.appendChild(content);
-      animatePageContent(DOM.bodyR);
+      const wrap = document.createElement('div');
+      wrap.className = 'content-enter';
+      if (content) wrap.appendChild(content);
+      DOM.bodyR.appendChild(wrap);
     }
     if (DOM.numR) DOM.numR.textContent = String(showingIdx + 1);
     if (DOM.psLeft) DOM.psLeft.style.display = 'none';
@@ -123,16 +126,20 @@ export function renderSpread(): void {
     const contentL = createPageContent(leftIdx);
     if (DOM.bodyL) {
       DOM.bodyL.innerHTML = '';
-      if (contentL) DOM.bodyL.appendChild(contentL);
-      animatePageContent(DOM.bodyL);
+      const wrapL = document.createElement('div');
+      wrapL.className = 'content-enter';
+      if (contentL) wrapL.appendChild(contentL);
+      DOM.bodyL.appendChild(wrapL);
     }
     if (DOM.numL) DOM.numL.textContent = String(leftIdx + 1);
 
     const contentR = createPageContent(rightIdx);
     if (DOM.bodyR) {
       DOM.bodyR.innerHTML = '';
-      if (contentR) DOM.bodyR.appendChild(contentR);
-      animatePageContent(DOM.bodyR);
+      const wrapR = document.createElement('div');
+      wrapR.className = 'content-enter';
+      if (contentR) wrapR.appendChild(contentR);
+      DOM.bodyR.appendChild(wrapR);
     }
     if (DOM.numR) DOM.numR.textContent = String(rightIdx + 1);
   }

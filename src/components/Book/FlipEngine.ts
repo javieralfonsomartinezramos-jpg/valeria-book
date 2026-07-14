@@ -1,6 +1,7 @@
 import { gsap } from 'gsap';
 import { CFG, TOTAL_SPREADS } from '../../config';
 import { createPageContent, hasPageContent } from './PageRenderer';
+import { setFlipPhase, setFlipDirection, getCurrentSpread } from '../../core/BookState';
 
 interface FlipDOM {
   flip: HTMLElement | null;
@@ -46,22 +47,22 @@ export function initFlipEngine(dom: FlipDOM, callbacks: FlipCallbacks): void {
   bindFlipEvents();
 }
 
-export function canGoNext(): boolean {
+export function canGoNext_(): boolean {
   const mob = cbs.isMobile();
   if (mob) return findNextPageIdx() !== -1;
-  return cbs.getCurrentSpread() < TOTAL_SPREADS - 1;
+  return getCurrentSpread() < TOTAL_SPREADS - 1;
 }
 
-export function canGoPrev(): boolean {
+export function canGoPrev_(): boolean {
   const mob = cbs.isMobile();
   if (mob) return findPrevPageIdx() !== -1;
-  return cbs.getCurrentSpread() > 0;
+  return getCurrentSpread() > 0;
 }
 
 export function getIsFlipping(): boolean { return isFlipping; }
 
 function getMobilePageIdx(): number {
-  const spread = cbs.getCurrentSpread();
+  const spread = getCurrentSpread();
   const rightIdx = spread * 2 + 1;
   if (hasPageContent(rightIdx)) return rightIdx;
   return spread * 2;
@@ -86,11 +87,13 @@ function findPrevPageIdx(): number {
 export function navigateWithFlip(dir: number): Promise<boolean> {
   return new Promise((resolve) => {
     if (isFlipping) { resolve(false); return; }
-    if (dir > 0 && !canGoNext()) { resolve(false); return; }
-    if (dir < 0 && !canGoPrev()) { resolve(false); return; }
+    if (dir > 0 && !canGoNext_()) { resolve(false); return; }
+    if (dir < 0 && !canGoPrev_()) { resolve(false); return; }
 
     const mob = cbs.isMobile();
     isFlipping = true;
+    setFlipPhase('folding');
+    setFlipDirection(dir);
     flipResolve = resolve;
 
     if (!flipDOM.flip) { resolve(false); return; }
@@ -115,7 +118,7 @@ export function navigateWithFlip(dir: number): Promise<boolean> {
         backPage = prev;
       }
     } else {
-      const spread = cbs.getCurrentSpread();
+      const spread = getCurrentSpread();
       if (dir > 0) {
         flipDOM.flip.classList.add('dir-right');
         frontPage = spread * 2 + 1;
@@ -130,45 +133,78 @@ export function navigateWithFlip(dir: number): Promise<boolean> {
     renderFlipContent(frontPage, backPage);
 
     gsap.set(flipDOM.flip!, { rotationY: 0 });
-    gsap.set(flipDOM.fFront!, { rotationY: 0 });
-    gsap.set(flipDOM.fBack!, { rotationY: 180 });
+    gsap.set(flipDOM.fFront!, { rotationY: 0, opacity: 1 });
+    gsap.set(flipDOM.fBack!, { rotationY: 180, opacity: 0 });
     gsap.set(flipDOM.fShadow!, { opacity: 0 });
     gsap.set(flipDOM.foldGrad!, { opacity: 0 });
 
     const dur = CFG.flipDuration / 1000;
+    const snap = CFG.snapDuration / 1000;
+    const pivot = 0.5;
+    const flipEl = flipDOM.flip!;
+    const shadowEl = flipDOM.fShadow!;
+    const gradEl = flipDOM.foldGrad!;
+    const frontEl = flipDOM.fFront!;
+    const backEl = flipDOM.fBack!;
+
     const tl = gsap.timeline({
-      onComplete: () => completeNavigation(dir, mob, resolve),
+      onComplete: () => completeFlip(dir, mob, resolve),
+      onUpdate: () => {
+        const progress = tl.progress();
+        if (progress >= pivot && frontEl) {
+          gsap.set(frontEl, { opacity: 0 });
+        }
+        if (progress >= pivot && backEl) {
+          gsap.set(backEl, { opacity: 1 });
+        }
+      },
     });
 
-    tl.to(flipDOM.flip!, {
-      rotationY: dir > 0 ? -180 : 180,
+    const targetAngle = dir > 0 ? -180 : 180;
+
+    tl.to(flipEl, {
+      rotationY: targetAngle,
       duration: dur,
       ease: 'power3.inOut',
     }, 0);
 
-    tl.to(flipDOM.fShadow!, {
-      opacity: 0.45,
-      duration: dur * 0.45,
+    tl.to(shadowEl, {
+      opacity: 0.5,
+      duration: dur * 0.4,
       ease: 'power2.out',
     }, 0);
 
-    tl.to(flipDOM.fShadow!, {
+    tl.to(shadowEl, {
       opacity: 0,
-      duration: dur * 0.55,
+      duration: dur * 0.6,
       ease: 'power3.in',
-    }, dur * 0.45);
+    }, dur * 0.4);
 
-    tl.to(flipDOM.foldGrad!, {
-      opacity: 0.7,
+    tl.to(gradEl, {
+      opacity: 0.75,
       duration: dur * 0.25,
       ease: 'power2.out',
     }, 0);
 
-    tl.to(flipDOM.foldGrad!, {
+    tl.to(gradEl, {
       opacity: 0,
-      duration: dur * 0.55,
+      duration: dur * 0.5,
       ease: 'power3.in',
     }, dur * 0.35);
+
+    if (snap > 0) {
+      tl.to(flipEl, {
+        rotationY: targetAngle * 1.02,
+        duration: snap * 0.4,
+        ease: 'power2.out',
+      }, `-=${snap * 0.15}`);
+
+      tl.to(flipEl, {
+        rotationY: targetAngle,
+        duration: snap * 0.6,
+        ease: 'power1.out',
+      });
+    }
   });
 }
 
@@ -188,10 +224,14 @@ function renderFlipContent(frontPage: number, backPage: number): void {
   if (flipDOM.fNumB) flipDOM.fNumB.textContent = String(backPage + 1);
 }
 
-function completeNavigation(dir: number, _mob: boolean, resolve: (v: boolean) => void): void {
+function completeFlip(dir: number, _mob: boolean, resolve: (v: boolean) => void): void {
   if (flipDOM.flip) flipDOM.flip.hidden = true;
   if (flipDOM.book) flipDOM.book.classList.remove('flipping');
   isFlipping = false;
+  setFlipPhase('settling');
+  setTimeout(() => {
+    setFlipPhase('idle');
+  }, 50);
   cbs.onNavigate(dir);
   if (flipResolve) { flipResolve(true); flipResolve = null; }
   resolve(true);
@@ -199,6 +239,7 @@ function completeNavigation(dir: number, _mob: boolean, resolve: (v: boolean) =>
 
 function cancelFlip(resolve: (v: boolean) => void): void {
   isFlipping = false;
+  setFlipPhase('idle');
   if (flipDOM.flip) flipDOM.flip.hidden = true;
   if (flipDOM.book) flipDOM.book.classList.remove('flipping');
   resolve(false);
@@ -230,8 +271,8 @@ function bindFlipEvents(): void {
     drag.startTime = Date.now();
 
     const half = x > rect.left + rect.width / 2;
-    if (half && canGoNext()) drag.dir = 1;
-    else if (!half && canGoPrev()) drag.dir = -1;
+    if (half && canGoNext_()) drag.dir = 1;
+    else if (!half && canGoPrev_()) drag.dir = -1;
     else drag.active = false;
   };
 
@@ -250,7 +291,7 @@ function bindFlipEvents(): void {
     const vel = dx / dt;
     drag.active = false;
 
-    if (progress >= CFG.flipThreshold || vel > 0.4) {
+    if (progress >= CFG.flipThreshold || vel > 0.3) {
       navigateWithFlip(dir);
     }
   };
@@ -271,16 +312,4 @@ function bindFlipEvents(): void {
   document.addEventListener('pointermove', (e) => onMove(e.clientX));
   document.addEventListener('pointerup', onUp);
   document.addEventListener('pointercancel', onUp);
-}
-
-export function animatePageContent(container: HTMLElement): void {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const children = Array.from(container.children).filter(
-    (c) => !c.classList.contains('p-image') && (c as HTMLElement).offsetParent !== null
-  );
-  if (children.length === 0) return;
-  gsap.fromTo(children, { opacity: 0, y: 8 }, {
-    opacity: 1, y: 0, duration: 0.35,
-    stagger: 0.05, ease: 'power2.out',
-  });
 }

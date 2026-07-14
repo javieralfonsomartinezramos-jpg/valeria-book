@@ -1,27 +1,9 @@
 import { TOTAL_SPREADS, SPREAD_LETTER_START, SPREAD_LETTER_COUNT, SPREAD_IMAGE_START, IMAGE_COUNT, SPREAD_MOVIE_START, SPREAD_MOVIE_COUNT, SPREAD_MUSIC, SPREAD_NOTES, SPREAD_CLOSING } from '../../config';
 import { EventBus } from '../../core/EventBus';
 import { Logger } from '../../core/Logger';
-import { navigateWithFlip, canGoNext, canGoPrev, getIsFlipping } from './FlipEngine';
+import { getIsFlipping, canGoNext, canGoPrev } from '../../core/BookState';
+import { navigateWithFlip } from './FlipEngine';
 import { Lightbox } from '../Lightbox/Lightbox';
-
-let currentSpread = 0;
-
-export function getCurrentSpread(): number { return currentSpread; }
-export function setCurrentSpread(n: number): void { currentSpread = n; }
-
-export function hasPrevPage(): boolean {
-  return currentSpread > 0;
-}
-
-export function hasNextPage(): boolean {
-  return currentSpread < TOTAL_SPREADS - 1;
-}
-
-export function completeNavigation(dir: number): void {
-  const targetSpread = currentSpread + dir;
-  if (targetSpread < 0 || targetSpread >= TOTAL_SPREADS) return;
-  currentSpread = targetSpread;
-}
 
 export function getPageName(pageIndex: number): string {
   if (pageIndex <= 1) return 'Portada';
@@ -94,6 +76,6 @@ export function bindKeyboardNav(): void {
 export function updateNavButtons(): void {
   const prevBtn = document.getElementById('nav-prev');
   const nextBtn = document.getElementById('nav-next');
-  if (prevBtn) prevBtn.toggleAttribute('aria-disabled', !hasPrevPage());
-  if (nextBtn) nextBtn.toggleAttribute('aria-disabled', !hasNextPage());
+  if (prevBtn) prevBtn.toggleAttribute('aria-disabled', !canGoPrev());
+  if (nextBtn) nextBtn.toggleAttribute('aria-disabled', !canGoNext());
 }
