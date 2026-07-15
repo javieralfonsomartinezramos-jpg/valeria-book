@@ -90,6 +90,8 @@ export const MUSIC = [
   'The Weeknd - DIE FOR YOU (Lyrics).mp3',
   'Tormenta.mp3',
   'Tyler, The Creator - See You Again (Lyrics) ft. Kali Uchis.mp3',
+  'Shawn Mendes, Camila Cabello - Señorita (Lyric Video).mp3',
+  'TurningPageSleepingAtLast.mp3',
 ];
 
 export const ROMANTIC_PHRASES = [

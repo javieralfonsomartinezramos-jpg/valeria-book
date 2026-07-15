@@ -1,11 +1,31 @@
 import { TOTAL_SPREADS } from '../config.js';
 import { Logger } from './Logger.js';
 
+let bookElement = null;
+
 const state = {
   currentSpread: 0,
   isFlipping: false,
   flipPhase: 'idle',
 };
+
+export function getBookElement() { return bookElement; }
+export function setBookConfig(cfg) {
+  if (cfg && cfg.bookElement) bookElement = cfg.bookElement;
+}
+
+export function setIsFlipping(v) {
+  state.isFlipping = !!v;
+  state.flipPhase = v ? 'flipping' : 'idle';
+}
+
+export function isFirstSpread() {
+  return state.currentSpread === 0;
+}
+
+export function isLastSpread() {
+  return state.currentSpread >= TOTAL_SPREADS - 1;
+}
 
 export function getCurrentSpread() { return state.currentSpread; }
 export function getIsFlipping() { return state.isFlipping; }
