@@ -379,7 +379,99 @@
     <audio id="sfx" preload="auto" aria-hidden="true"></audio>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- ⏱ FORENSIC: GSAP load tracking -->
+  <script>
+    (function(){
+      var _t0 = performance.now();
+      console.log('%c⏱ [FORENSIC] index.html — HTML parsing complete', 'color:#f28b9e;font-weight:bold');
+      window.__FORENSIC_T0 = _t0;
+      window.__FORENSIC_GSAP_LOADING = true;
+      window.__FORENSIC_EVENTS = [];
+      function e(name, data) { window.__FORENSIC_EVENTS.push({name:name,data:data||{},t:performance.now()-_t0}); }
+      e('html-parsed');
+
+      window.onerror = function(msg, url, line, col, err) {
+        console.error('%c🚨 [FORENSIC] onerror: ' + msg + ' at ' + url + ':' + line + ':' + col, 'color:#c0392b;font-weight:bold');
+        if(err && err.stack) console.error(err.stack);
+        e('onerror',{msg:msg,url:url,line:line,col:col});
+        return true;
+      };
+
+      window.onunhandledrejection = function(event) {
+        console.error('%c🚨 [FORENSIC] onunhandledrejection: ' + (event.reason?.message || event.reason), 'color:#c0392b;font-weight:bold');
+        if(event.reason?.stack) console.error(event.reason.stack);
+        e('onunhandledrejection',{reason:event.reason?.message||String(event.reason)});
+      };
+
+      document.addEventListener('readystatechange', function(){
+        e('readystatechange:'+document.readyState);
+        console.log('%c⏱ [FORENSIC] readystatechange → ' + document.readyState + ' at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#f28b9e');
+        if(document.readyState === 'interactive') {
+          console.log('%c⏱ [FORENSIC] DOMContentLoaded (via readystatechange) at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#f28b9e');
+        }
+        if(document.readyState === 'complete') {
+          console.log('%c⏱ [FORENSIC] page fully loaded (via readystatechange) at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#f28b9e');
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', function(){
+        e('DOMContentLoaded');
+        console.log('%c⏱ [FORENSIC] DOMContentLoaded event at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#f28b9e;font-weight:bold');
+
+        /* Verify loader DOM elements exist at DOMContentLoaded */
+        var _els = [
+          ['#loader', document.getElementById('loader')],
+          ['#loader-fill', document.getElementById('loader-fill')],
+          ['#loader-pct', document.getElementById('loader-pct')],
+          ['#portal', document.getElementById('portal')],
+          ['#portal-btn', document.getElementById('portal-btn')],
+          ['#book', document.getElementById('book')],
+          ['#app', document.getElementById('app')],
+          ['#audio', document.getElementById('audio')],
+          ['#sfx', document.getElementById('sfx')],
+        ];
+        var _allFound = true;
+        for(var _i=0; _i<_els.length; _i++) {
+          var _id = _els[_i][0], _el = _els[_i][1];
+          if(_el) {
+            console.log('  ✓ [FORENSIC] Element ' + _id + ' — FOUND');
+          } else {
+            console.error('  ✗ [FORENSIC] Element ' + _id + ' — NULL ⚠️');
+            _allFound = false;
+          }
+        }
+        if(_allFound) console.log('%c  ✓ [FORENSIC] ALL critical DOM elements present at DOMContentLoaded', 'color:#27ae60;font-weight:bold');
+        e('dom-check',{allFound:_allFound});
+
+        /* Check CSS variable --rose availability */
+        var _style = getComputedStyle(document.documentElement);
+        var _rose = _style.getPropertyValue('--rose');
+        if(_rose) {
+          console.log('  ✓ [FORENSIC] CSS variable --rose = "' + _rose.trim() + '" — AVAILABLE');
+        } else {
+          console.warn('  ⚠ [FORENSIC] CSS variable --rose — NOT DEFINED ⚠️');
+        }
+        e('css-var-check',{roseAvailable:!!_rose});
+
+        /* Check fonts availability */
+        if(document.fonts) {
+          document.fonts.ready.then(function(){
+            console.log('%c  ✓ [FORENSIC] document.fonts.ready — all fonts loaded at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#27ae60');
+          });
+        }
+      });
+
+      window.addEventListener('load', function(){
+        e('window.load');
+        console.log('%c⏱ [FORENSIC] window.load event at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#f28b9e;font-weight:bold');
+      });
+    })();
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"
+    onload="console.log('%c⏱ [FORENSIC] GSAP — LOADED at +' + (performance.now() - (window.__FORENSIC_T0||0)).toFixed(1) + 'ms', 'color:#f28b9e;font-weight:bold'); window.__FORENSIC_GSAP_LOADING = false;"
+    onerror="console.error('%c🚨 [FORENSIC] GSAP — FAILED TO LOAD', 'color:#c0392b;font-weight:bold');">
+  </script>
+  <script type="module" src="js/forensic.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

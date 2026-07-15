@@ -1,3 +1,18 @@
+console.log(`%c[FORENSIC] MODULE LOADED — js/components/Lightbox.js`, 'color:#27ae60;font-weight:bold');
+
+const _fB = () => window.__FORENSIC;
+const _fVT = () => `[${(performance.now() - (_fB()?.t0 || performance.now())).toFixed(2)}ms]`;
+const _fW = (fn, label, path) => function(...args) {
+  const _t0 = performance.now(); const _ts = () => `[${(performance.now() - (_fB()?.t0 || _t0)).toFixed(2)}ms]`;
+  console.groupCollapsed(`${_ts()} [FN] ${path} → ${label}`);
+  try {
+    const r = fn.apply(this, args);
+    if (r instanceof Promise) { r.then(v => { console.log(`${_ts()} [FN] ✓ ${label} — resolved in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); return v; }, e => { console.error(`${_ts()} [FN] 🚨 ${label} — rejected: ${e?.message||e}`); console.groupEnd(); throw e; }); }
+    else { console.log(`${_ts()} [FN] ✓ ${label} — completed in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); }
+    return r;
+  } catch(e) { console.error(`${_ts()} [FN] 🚨 ${label} — exception: ${e?.message||e}`); console.trace(); console.groupEnd(); throw e; }
+};
+
 import { StorageManager } from '../core/StorageManager.js';
 import { FocusTrap } from '../ui/FocusTrap.js';
 import { ImageManager } from '../managers/ImageManager.js';
@@ -11,7 +26,7 @@ let prevFocus = null;
 let pendingLoad = 0;
 let built = false;
 
-function buildDOM() {
+function _f_buildDOM() {
   if (built) return;
   built = true;
 
@@ -68,10 +83,15 @@ function buildDOM() {
 
   document.body.appendChild(lb);
 }
+const buildDOM = _fW(_f_buildDOM, 'buildDOM', 'js/components/Lightbox.js');
 
-function setImage(src, idx) {
+function _f_setImage(src, idx) {
+  console.log(`%c[FORENSIC] getElementById('lb-img') — js/components/Lightbox.js`, 'color:#f28b9e;font-weight:bold');
   const lbImg = document.getElementById('lb-img');
+  if (lbImg) { console.log(`%c[FORENSIC] getElementById('lb-img') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('lb-img') → NULL`, 'color:#e67e22;font-weight:bold'); }
+  console.log(`%c[FORENSIC] getElementById('lb-loading') — js/components/Lightbox.js`, 'color:#f28b9e;font-weight:bold');
   const lbLoader = document.getElementById('lb-loading');
+  if (lbLoader) { console.log(`%c[FORENSIC] getElementById('lb-loading') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('lb-loading') → NULL`, 'color:#e67e22;font-weight:bold'); }
   if (!lbImg) return;
 
   const loadId = ++pendingLoad;
@@ -94,21 +114,28 @@ function setImage(src, idx) {
   lbImg.src = src;
   lbImg.alt = 'Fotograf\u00EDa ' + (idx + 1);
 }
+const setImage = _fW(_f_setImage, 'setImage', 'js/components/Lightbox.js');
 
-function updateCounter() {
+function _f_updateCounter() {
+  console.log(`%c[FORENSIC] getElementById('lb-counter') — js/components/Lightbox.js`, 'color:#f28b9e;font-weight:bold');
   const c = document.getElementById('lb-counter');
+  if (c) { console.log(`%c[FORENSIC] getElementById('lb-counter') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('lb-counter') → NULL`, 'color:#e67e22;font-weight:bold'); }
   const data = ImageManager.getData();
   if (c) c.textContent = ((currentIdx ?? 0) + 1) + ' / ' + data.length;
 }
+const updateCounter = _fW(_f_updateCounter, 'updateCounter', 'js/components/Lightbox.js');
 
-function updateFav() {
+function _f_updateFav() {
+  console.log(`%c[FORENSIC] getElementById('lb-fav') — js/components/Lightbox.js`, 'color:#f28b9e;font-weight:bold');
   const btn = document.getElementById('lb-fav');
+  if (btn) { console.log(`%c[FORENSIC] getElementById('lb-fav') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('lb-fav') → NULL`, 'color:#e67e22;font-weight:bold'); }
   if (!btn || currentIdx === null) return;
   const favs = StorageManager.getFavs();
   const isFav = favs.indexOf(currentIdx) >= 0;
   btn.classList.toggle('is-fav', isFav);
   btn.setAttribute('aria-label', isFav ? 'Quitar favorita' : 'A\u00F1adir favorita');
 }
+const updateFav = _fW(_f_updateFav, 'updateFav', 'js/components/Lightbox.js');
 
 export class Lightbox {
   static open(idx) {
@@ -119,20 +146,29 @@ export class Lightbox {
     if (!img) return;
     prevFocus = document.activeElement;
     currentIdx = idx;
+    console.log(`%c[FORENSIC] getElementById('lightbox') — js/components/Lightbox.js`, 'color:#f28b9e;font-weight:bold');
     const lb = document.getElementById('lightbox');
+    if (lb) { console.log(`%c[FORENSIC] getElementById('lightbox') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('lightbox') → NULL`, 'color:#e67e22;font-weight:bold'); }
+    console.log(`%c[FORENSIC] getElementById('lb-img') — js/components/Lightbox.js`, 'color:#f28b9e;font-weight:bold');
     const lbImg = document.getElementById('lb-img');
+    if (lbImg) { console.log(`%c[FORENSIC] getElementById('lb-img') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('lb-img') → NULL`, 'color:#e67e22;font-weight:bold'); }
     if (!lb || !lbImg) return;
     setImage(img.path, idx);
     lb.hidden = false;
     document.body.style.overflow = 'hidden';
-    releaseFocus = FocusTrap.trap(lb, document.getElementById('lb-close'));
+    console.log(`%c[FORENSIC] getElementById('lb-close') — js/components/Lightbox.js`, 'color:#f28b9e;font-weight:bold');
+    const _lbClose = document.getElementById('lb-close');
+    if (_lbClose) { console.log(`%c[FORENSIC] getElementById('lb-close') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('lb-close') → NULL`, 'color:#e67e22;font-weight:bold'); }
+    releaseFocus = FocusTrap.trap(lb, _lbClose);
     updateCounter();
     updateFav();
   }
 
   static close() {
     currentIdx = null;
+    console.log(`%c[FORENSIC] getElementById('lightbox') — js/components/Lightbox.js`, 'color:#f28b9e;font-weight:bold');
     const lb = document.getElementById('lightbox');
+    if (lb) { console.log(`%c[FORENSIC] getElementById('lightbox') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('lightbox') → NULL`, 'color:#e67e22;font-weight:bold'); }
     if (lb) lb.hidden = true;
     document.body.style.overflow = '';
     if (releaseFocus) { releaseFocus(); releaseFocus = null; }
@@ -166,8 +202,12 @@ export class Lightbox {
   }
 
   static renderFavs() {
+    console.log(`%c[FORENSIC] getElementById('g-favs') — js/components/Lightbox.js`, 'color:#f28b9e;font-weight:bold');
     const section = document.getElementById('g-favs');
+    if (section) { console.log(`%c[FORENSIC] getElementById('g-favs') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('g-favs') → NULL`, 'color:#e67e22;font-weight:bold'); }
+    console.log(`%c[FORENSIC] getElementById('g-favs-grid') — js/components/Lightbox.js`, 'color:#f28b9e;font-weight:bold');
     const grid = document.getElementById('g-favs-grid');
+    if (grid) { console.log(`%c[FORENSIC] getElementById('g-favs-grid') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('g-favs-grid') → NULL`, 'color:#e67e22;font-weight:bold'); }
     if (!section || !grid) return;
     const favs = StorageManager.getFavs();
     const data = ImageManager.getData();
@@ -192,3 +232,10 @@ export class Lightbox {
     });
   }
 }
+
+Lightbox.open = _fW(Lightbox.open.bind(Lightbox), 'open', 'js/components/Lightbox.js');
+Lightbox.close = _fW(Lightbox.close.bind(Lightbox), 'close', 'js/components/Lightbox.js');
+Lightbox.prev = _fW(Lightbox.prev.bind(Lightbox), 'prev', 'js/components/Lightbox.js');
+Lightbox.next = _fW(Lightbox.next.bind(Lightbox), 'next', 'js/components/Lightbox.js');
+Lightbox.handleKey = _fW(Lightbox.handleKey.bind(Lightbox), 'handleKey', 'js/components/Lightbox.js');
+Lightbox.renderFavs = _fW(Lightbox.renderFavs.bind(Lightbox), 'renderFavs', 'js/components/Lightbox.js');

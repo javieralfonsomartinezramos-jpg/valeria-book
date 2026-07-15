@@ -1,12 +1,27 @@
+console.log(`%c[FORENSIC] MODULE LOADED — js/components/FlipEngine.js`, 'color:#27ae60;font-weight:bold');
+
+const _fB = () => window.__FORENSIC;
+const _fVT = () => `[${(performance.now() - (_fB()?.t0 || performance.now())).toFixed(2)}ms]`;
+const _fW = (fn, label, path) => function(...args) {
+  const _t0 = performance.now(); const _ts = () => `[${(performance.now() - (_fB()?.t0 || _t0)).toFixed(2)}ms]`;
+  console.groupCollapsed(`${_ts()} [FN] ${path} → ${label}`);
+  try {
+    const r = fn.apply(this, args);
+    if (r instanceof Promise) { r.then(v => { console.log(`${_ts()} [FN] ✓ ${label} — resolved in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); return v; }, e => { console.error(`${_ts()} [FN] 🚨 ${label} — rejected: ${e?.message||e}`); console.groupEnd(); throw e; }); }
+    else { console.log(`${_ts()} [FN] ✓ ${label} — completed in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); }
+    return r;
+  } catch(e) { console.error(`${_ts()} [FN] 🚨 ${label} — exception: ${e?.message||e}`); console.trace(); console.groupEnd(); throw e; }
+};
+
 import { CFG, TOTAL_SPREADS } from '../config.js';
 import { EventBus } from '../core/EventBus.js';
 import { completeNavigation, getCurrentSpread, getIsFlipping, setIsFlipping, getBookElement } from '../core/BookState.js';
-import { renderSpread, showCurrentSpread } from './BookEngine.js';
+import { renderSpread } from './BookEngine.js';
 
-let flipTimeline = null;
-
-function createFlipPage(dir) {
+function _f_createFlipPage(dir) {
+  console.log(`%c[FORENSIC] getElementById('flip-page') — js/components/FlipEngine.js`, 'color:#f28b9e;font-weight:bold');
   const flipEl = document.getElementById('flip-page');
+  if (flipEl) { console.log(`%c[FORENSIC] getElementById('flip-page') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('flip-page') → NULL`, 'color:#e67e22;font-weight:bold'); }
   const bookEl = getBookElement();
   if (!flipEl || !bookEl) return null;
   const w = bookEl.offsetWidth;
@@ -48,8 +63,9 @@ function createFlipPage(dir) {
 
   return { w, flipEl };
 }
+const createFlipPage = _fW(_f_createFlipPage, 'createFlipPage', 'js/components/FlipEngine.js');
 
-export function navigateWithFlip(dir, onComplete) {
+function _f_navigateWithFlip(dir, onComplete) {
   if (getIsFlipping()) return;
   const cur = getCurrentSpread();
   const next = cur + dir;
@@ -64,8 +80,9 @@ export function navigateWithFlip(dir, onComplete) {
     instantNavigate(dir, onComplete);
   }
 }
+export const navigateWithFlip = _fW(_f_navigateWithFlip, 'navigateWithFlip', 'js/components/FlipEngine.js');
 
-function gsapFlipNavigate(dir, onComplete) {
+function _f_gsapFlipNavigate(dir, onComplete) {
   const info = createFlipPage(dir);
   if (!info) { instantNavigate(dir, onComplete); return; }
   const { flipEl } = info;
@@ -93,11 +110,13 @@ function gsapFlipNavigate(dir, onComplete) {
 
   flipTimeline = tl;
 }
+const gsapFlipNavigate = _fW(_f_gsapFlipNavigate, 'gsapFlipNavigate', 'js/components/FlipEngine.js');
 
-function instantNavigate(dir, onComplete) {
+function _f_instantNavigate(dir, onComplete) {
   completeNavigation(dir);
   setIsFlipping(false);
   renderSpread(getCurrentSpread());
   showCurrentSpread();
   if (onComplete) onComplete();
 }
+const instantNavigate = _fW(_f_instantNavigate, 'instantNavigate', 'js/components/FlipEngine.js');

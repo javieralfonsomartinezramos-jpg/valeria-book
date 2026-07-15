@@ -1,3 +1,18 @@
+console.log(`%c[FORENSIC] MODULE LOADED — js/components/Particles.js`, 'color:#27ae60;font-weight:bold');
+
+const _fB = () => window.__FORENSIC;
+const _fVT = () => `[${(performance.now() - (_fB()?.t0 || performance.now())).toFixed(2)}ms]`;
+const _fW = (fn, label, path) => function(...args) {
+  const _t0 = performance.now(); const _ts = () => `[${(performance.now() - (_fB()?.t0 || _t0)).toFixed(2)}ms]`;
+  console.groupCollapsed(`${_ts()} [FN] ${path} → ${label}`);
+  try {
+    const r = fn.apply(this, args);
+    if (r instanceof Promise) { r.then(v => { console.log(`${_ts()} [FN] ✓ ${label} — resolved in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); return v; }, e => { console.error(`${_ts()} [FN] 🚨 ${label} — rejected: ${e?.message||e}`); console.groupEnd(); throw e; }); }
+    else { console.log(`${_ts()} [FN] ✓ ${label} — completed in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); }
+    return r;
+  } catch(e) { console.error(`${_ts()} [FN] 🚨 ${label} — exception: ${e?.message||e}`); console.trace(); console.groupEnd(); throw e; }
+};
+
 import { AnimationManager } from '../managers/AnimationManager.js';
 
 let container = null;
@@ -5,7 +20,7 @@ let running = false;
 let rafId = 0;
 const particles = [];
 
-function spawn(initial) {
+function _f_spawn(initial) {
   if (!container) return;
   const el = document.createElement('span');
   el.className = 'particle';
@@ -29,8 +44,9 @@ function spawn(initial) {
     maxLife: 800 + Math.random() * 600,
   });
 }
+const spawn = _fW(_f_spawn, 'spawn', 'js/components/Particles.js');
 
-function loop() {
+function _f_loop() {
   if (!running || AnimationManager.isPaused()) { rafId = requestAnimationFrame(loop); return; }
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
@@ -50,8 +66,9 @@ function loop() {
   }
   rafId = requestAnimationFrame(loop);
 }
+const loop = _fW(_f_loop, 'loop', 'js/components/Particles.js');
 
-export function startParticles() {
+function _f_startParticles() {
   if (running) return;
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (prefersReduced) return;
@@ -59,7 +76,9 @@ export function startParticles() {
   container = document.createElement('div');
   container.className = 'particle-field';
   container.setAttribute('aria-hidden', 'true');
+  console.log(`%c[FORENSIC] getElementById('app') — js/components/Particles.js`, 'color:#f28b9e;font-weight:bold');
   const app = document.getElementById('app');
+  if (app) { console.log(`%c[FORENSIC] getElementById('app') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('app') → NULL`, 'color:#e67e22;font-weight:bold'); }
   if (!app) { container = null; return; }
   app.appendChild(container);
   running = true;
@@ -68,3 +87,4 @@ export function startParticles() {
   rafId = requestAnimationFrame(loop);
   AnimationManager.register('particles', rafId);
 }
+export const startParticles = _fW(_f_startParticles, 'startParticles', 'js/components/Particles.js');
