@@ -7,6 +7,7 @@ export const CFG = {
   saveDebounce: 3000,
   crossfadeDuration: 2000,
   lowPerfCores: 4,
+  flipPerspective: 1200,
 };
 
 export const IMAGES = [
@@ -147,3 +148,25 @@ export const SPREAD_MUSIC = SPREAD_IMAGE_START + IMAGE_COUNT;
 export const SPREAD_NOTES = SPREAD_MUSIC + 1;
 export const SPREAD_CLOSING = SPREAD_NOTES + 1;
 export const TOTAL_SPREADS = SPREAD_CLOSING + 1;
+
+export function getPageName(pageIndex) {
+  if (pageIndex <= 1) return 'Portada';
+  const ls = SPREAD_LETTER_START * 2;
+  const le = ls + SPREAD_LETTER_COUNT * 2;
+  if (pageIndex >= ls && pageIndex < le) {
+    const off = pageIndex - ls;
+    return off < 4 ? 'Prólogo' : 'Cartas';
+  }
+  const ms = SPREAD_MOVIE_START * 2;
+  if (pageIndex >= ms && pageIndex < ms + SPREAD_MOVIE_COUNT * 2) return 'Nuestras películas';
+  const isp = SPREAD_IMAGE_START * 2;
+  const iep = isp + IMAGE_COUNT * 2;
+  if (pageIndex >= isp && pageIndex < iep) return pageIndex % 2 === 0 ? 'Nuestros recuerdos' : 'Gracias';
+  const mp = SPREAD_MUSIC * 2;
+  if (pageIndex === mp || pageIndex === mp + 1) return 'Nuestra música';
+  const np = SPREAD_NOTES * 2;
+  if (pageIndex === np || pageIndex === np + 1) return 'Dedicatoria y notas';
+  const cp = SPREAD_CLOSING * 2;
+  if (pageIndex === cp) return 'Fin';
+  return '';
+}

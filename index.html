@@ -34,6 +34,12 @@
   <link rel="apple-touch-icon" href="favicon.svg">
   <link rel="manifest" href="manifest.webmanifest">
 
+  <link rel="stylesheet" href="css/main.css">
+
+  <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous">
+
+  <style>/* critical */body{background:#0f0a0d;color:#faf5f0;margin:0;font-family:Inter,sans-serif}.loader,.portal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center}.loader{background:#0f0a0d;z-index:1001}.portal{background:linear-gradient(135deg,#1a0f14,#0f0a0d);flex-direction:column}.portal-heart{font-size:3rem;color:#e8d5a3}.portal-title{font-size:1.6rem;font-family:Playfair Display,Georgia,serif;color:#e8d5a3;text-align:center;margin:.5rem 0}.portal-btn{background:transparent;border:1px solid #f28b9e;color:#f28b9e;padding:.75rem 2rem;border-radius:2rem;cursor:pointer;font-size:1rem;font-family:inherit;margin-top:1rem}.loader-heart{font-size:2rem;color:#f28b9e;animation:pulse 1.2s ease-in-out infinite}@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.7}}.loader-bar-track{width:200px;height:2px;background:#2c1810;border-radius:1px;margin-top:1rem;overflow:hidden}.loader-bar-fill{height:100%;background:#f28b9e;border-radius:1px;transition:width .3s}.loader-pct{font-size:.75rem;color:#8a5a4a;margin-top:.5rem}</style>
+
   <!-- Preload critical resources -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -369,49 +375,11 @@
       </button>
     </div>
 
-    <div id="lightbox" class="lightbox" role="dialog" aria-label="Visor de imagenes" hidden>
-      <div class="lb-bg"></div>
-      <div class="lb-inner">
-        <button class="lb-close" id="lb-close" aria-label="Cerrar visor">&times;</button>
-        <button class="lb-nav lb-prev" id="lb-prev" aria-label="Imagen anterior">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="lb-loading" id="lb-loading" aria-hidden="true"></div>
-        <img class="lb-img" id="lb-img" src="" alt="Fotografía">
-        <button class="lb-nav lb-next" id="lb-next" aria-label="Imagen siguiente">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <span class="lb-counter" id="lb-counter" aria-live="polite"></span>
-        <button class="lb-fav" id="lb-fav" aria-label="Añadir a favoritos">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-      </div>
-    </div>
-
     <audio id="audio" preload="metadata" aria-hidden="true"></audio>
     <audio id="sfx" preload="auto" aria-hidden="true"></audio>
   </div>
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/reset.css">
-  <link rel="stylesheet" href="css/typography.css">
-  <link rel="stylesheet" href="css/animations.css">
-  <link rel="stylesheet" href="css/components/book.css">
-  <link rel="stylesheet" href="css/components/portal.css">
-  <link rel="stylesheet" href="css/components/lightbox.css">
-  <link rel="stylesheet" href="css/components/loader.css">
-  <link rel="stylesheet" href="css/components/music-player.css">
-  <link rel="stylesheet" href="css/components/notes.css">
-  <link rel="stylesheet" href="css/components/sidebar.css">
-  <link rel="stylesheet" href="css/components/particles.css">
-  <link rel="stylesheet" href="css/components/petals.css">
-  <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="css/accessibility.css">
-
-  <!-- GSAP from CDN (used for flip animations) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

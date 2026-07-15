@@ -1,26 +1,39 @@
-import { AudioManager } from '../services/AudioManager.js';
 import { EventBus } from '../core/EventBus.js';
 import { cleanLabel } from '../core/Utils.js';
 import { MUSIC } from '../config.js';
+import { AudioManager } from '../services/AudioManager.js';
+import { DOMManager } from '../managers/DOMManager.js';
+
+let uiInited = false;
+let shuffle = false;
+let repeat = 'off';
+
+function syncToggleButtons() {
+  const shuf = DOMManager.get('mp-shuffle');
+  if (shuf) shuf.classList.toggle('active', shuffle);
+  const rep = DOMManager.get('mp-repeat');
+  if (rep) {
+    rep.classList.toggle('active', repeat !== 'off');
+    rep.classList.toggle('mp-repeat-once', repeat === 'one');
+    const labels = { off: 'Repetir todo', all: 'Repetir todo', one: 'Repetir una canci\u00F3n' };
+    rep.setAttribute('aria-label', labels[repeat]);
+  }
+}
+
+function syncVolumeIcon() {
+  const wrap = DOMManager.get('mp-mute');
+  if (wrap) wrap.classList.toggle('mp-muted', AudioManager.getIsMuted());
+}
 
 export class MusicPlayer {
-  static uiInited = false;
-  static shuffle = false;
-  static repeat = 'off';
-
-  static init() {
-    AudioManager.init();
-    EventBus.on('music:track-changed', () => this.refreshUI());
-    EventBus.on('ui:reach-music', () => this.initUI());
-  }
-
   static initUI() {
-    if (this.uiInited) return;
-    this.uiInited = true;
-    const queue = document.getElementById('mp-queue');
-    if (!queue) return;
+    if (uiInited) return;
+    uiInited = true;
 
-    if (queue.children.length === 0) {
+    AudioManager.refreshUI();
+
+    const queue = DOMManager.get('mp-queue');
+    if (queue && queue.children.length === 0) {
       MUSIC.forEach((name, i) => {
         const item = document.createElement('button');
         item.type = 'button';
@@ -40,81 +53,44 @@ export class MusicPlayer {
       });
     }
 
-    this.bindUIEvents();
-    AudioManager.updateUI();
-    this.syncControls();
-    this.syncToggleButtons();
-  }
-
-  static bindUIEvents() {
-    const bindClick = (id, fn) => {
-      const el = document.getElementById(id);
-      if (el && !el.dataset.bound) { el.dataset.bound = 'true'; el.addEventListener('click', fn); }
-    };
-
-    bindClick('mp-play', () => AudioManager.toggle());
-    bindClick('mp-prev', () => AudioManager.prev());
-    bindClick('mp-next', () => AudioManager.next(false));
-    bindClick('mp-mute', () => { AudioManager.toggleMute(); this.syncVolumeIcon(); });
-
-    bindClick('mp-shuffle', () => {
-      this.shuffle = !this.shuffle;
-      this.syncToggleButtons();
-      EventBus.emit('music:shuffle', { enabled: this.shuffle });
+    DOMManager.onClick('#mp-play', () => AudioManager.toggle());
+    DOMManager.onClick('#mp-prev', () => AudioManager.prev());
+    DOMManager.onClick('#mp-next', () => AudioManager.next(false));
+    DOMManager.onClick('#mp-mute', () => { AudioManager.toggleMute(); syncVolumeIcon(); });
+    DOMManager.onClick('#mp-shuffle', () => {
+      shuffle = !shuffle;
+      syncToggleButtons();
+      EventBus.emit('music:shuffle', { enabled: shuffle });
     });
-
-    bindClick('mp-repeat', () => {
+    DOMManager.onClick('#mp-repeat', () => {
       const modes = ['off', 'all', 'one'];
-      const idx = modes.indexOf(this.repeat);
-      this.repeat = modes[(idx + 1) % modes.length];
-      this.syncToggleButtons();
-      EventBus.emit('music:repeat', { mode: this.repeat });
+      const idx = modes.indexOf(repeat);
+      repeat = modes[(idx + 1) % modes.length];
+      syncToggleButtons();
+      EventBus.emit('music:repeat', { mode: repeat });
     });
 
-    const prog = document.getElementById('mp-prog');
-    if (prog && !prog.dataset.bound) {
-      prog.dataset.bound = 'true';
+    const prog = DOMManager.get('mp-prog');
+    if (prog && !prog._mpBound) {
+      prog._mpBound = true;
       prog.addEventListener('input', () => {
         if (AudioManager.getCurrentIdx() < 0) return;
         AudioManager.seek(parseFloat(prog.value));
       });
     }
 
-    const vol = document.getElementById('mp-vol');
-    if (vol && !vol.dataset.bound) {
-      vol.dataset.bound = 'true';
+    const vol = DOMManager.get('mp-vol');
+    if (vol && !vol._mpBound) {
+      vol._mpBound = true;
       vol.addEventListener('input', () => {
         AudioManager.setVolume(parseFloat(vol.value));
-        this.syncVolumeIcon();
+        syncVolumeIcon();
       });
     }
-  }
 
-  static syncToggleButtons() {
-    const shuf = document.getElementById('mp-shuffle');
-    if (shuf) shuf.classList.toggle('active', this.shuffle);
-
-    const rep = document.getElementById('mp-repeat');
-    if (rep) {
-      rep.classList.toggle('active', this.repeat !== 'off');
-      rep.classList.toggle('mp-repeat-once', this.repeat === 'one');
-      const labels = { off: 'Repetir todo', all: 'Repetir todo', one: 'Repetir una canci\u00F3n' };
-      rep.setAttribute('aria-label', labels[this.repeat]);
-    }
-  }
-
-  static syncVolumeIcon() {
-    const wrap = document.getElementById('mp-mute');
-    if (wrap) wrap.classList.toggle('mp-muted', AudioManager.getIsMuted());
-  }
-
-  static refreshUI() {
     AudioManager.updateUI();
-  }
-
-  static syncControls() {
-    const vol = document.getElementById('mp-vol');
-    if (vol) vol.value = String(AudioManager.getIsMuted() ? 0 : AudioManager.getVolume());
-    this.syncVolumeIcon();
+    const cachedVol = DOMManager.get('mp-vol');
+    if (cachedVol) cachedVol.value = String(AudioManager.getIsMuted() ? 0 : AudioManager.getVolume());
+    syncVolumeIcon();
   }
 }

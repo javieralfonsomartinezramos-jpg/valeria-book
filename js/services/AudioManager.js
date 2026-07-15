@@ -4,271 +4,274 @@ import { StorageManager } from '../core/StorageManager.js';
 import { cleanLabel, fmtTime } from '../core/Utils.js';
 import { CFG, MUSIC } from '../config.js';
 
-export class AudioManager {
-  static audio = null;
-  static currentIdx = -1;
-  static isPlaying = false;
-  static isMuted = false;
-  static savedVol = 1;
-  static rafId = 0;
-  static saveTimer = 0;
-  static loadTimer = 0;
-  static isLoading = false;
-  static errorSkips = 0;
-  static inited = false;
+let audio = null;
+let currentIdx = -1;
+let isPlaying = false;
+let isMuted = false;
+let savedVol = 1;
+let rafId = 0;
+let saveTimer = 0;
+let loadTimer = 0;
+let isLoading = false;
+let errorSkips = 0;
+let inited = false;
 
+let progEl = null;
+let curEl = null;
+let totEl = null;
+let trackEl = null;
+let artistEl = null;
+let playBtnEl = null;
+let piconEl = null;
+let eqEl = null;
+
+export class AudioManager {
   static init() {
-    if (this.inited) return;
-    this.inited = true;
-    this.audio = document.getElementById('audio');
-    if (!this.audio) {
-      Logger.warn('AudioManager', 'Audio element not found');
-      return;
-    }
-    this.bindAudioEvents();
-    this.restoreState();
-    this.setupMediaSession();
+    if (inited) return;
+    inited = true;
+    audio = document.getElementById('audio');
+    if (!audio) { Logger.warn('AudioManager', 'Audio element not found'); return; }
+    bindAudioEvents();
+    restoreState();
+    setupMediaSession();
+  }
+
+  static refreshUI() {
+    progEl = document.getElementById('mp-prog');
+    curEl = document.getElementById('mp-cur');
+    totEl = document.getElementById('mp-tot');
+    trackEl = document.getElementById('mp-track');
+    artistEl = document.getElementById('mp-artist');
+    playBtnEl = document.getElementById('mp-play');
+    piconEl = document.getElementById('mp-picon');
+    eqEl = document.getElementById('mp-eq');
+    updatePlayBtn();
+  }
+
+  static destroy() {
+    if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = 0; }
+    if (loadTimer) { clearTimeout(loadTimer); loadTimer = 0; }
+    if (audio) { audio.pause(); audio.src = ''; }
+    audio = null;
+    inited = false;
   }
 
   static play(idx, fromError) {
-    if (idx < 0 || idx >= MUSIC.length || !this.audio) return;
-    if (!fromError) this.errorSkips = 0;
-    this.currentIdx = idx;
-    this.audio.src = CFG.musicDir + encodeURIComponent(MUSIC[idx]);
-    this.audio.load();
-    this.isLoading = true;
-    if (this.loadTimer) clearTimeout(this.loadTimer);
-    this.loadTimer = setTimeout(() => {
-      if (AudioManager.isLoading) {
-        const track = document.getElementById('mp-track');
-        if (track) track.textContent = 'Cargando...';
-      }
+    if (idx < 0 || idx >= MUSIC.length || !audio) return;
+    if (!fromError) errorSkips = 0;
+    currentIdx = idx;
+    audio.src = CFG.musicDir + encodeURIComponent(MUSIC[idx]);
+    audio.load();
+    isLoading = true;
+    if (loadTimer) clearTimeout(loadTimer);
+    loadTimer = setTimeout(() => {
+      if (isLoading && trackEl) trackEl.textContent = 'Cargando...';
     }, 800);
 
-    this.audio.play()
-      .then(() => {
-        AudioManager.isLoading = false;
-        AudioManager.errorSkips = 0;
-        if (AudioManager.loadTimer) clearTimeout(AudioManager.loadTimer);
-        AudioManager.updateUI();
-        AudioManager.debounceSave();
-      })
-      .catch(() => {
-        AudioManager.isLoading = false;
-        if (AudioManager.loadTimer) clearTimeout(AudioManager.loadTimer);
-      });
-    EventBus.emit('music:track-changed', {
-      index: idx,
-      title: cleanLabel(MUSIC[idx]),
+    audio.play().then(() => {
+      isLoading = false;
+      errorSkips = 0;
+      if (loadTimer) { clearTimeout(loadTimer); loadTimer = 0; }
+      updateUI();
+      debounceSave();
+    }).catch(() => {
+      isLoading = false;
+      if (loadTimer) { clearTimeout(loadTimer); loadTimer = 0; }
     });
+    EventBus.emit('music:track-changed', { index: idx, title: cleanLabel(MUSIC[idx]) });
   }
 
   static toggle() {
-    if (!this.audio) return;
-    if (!this.audio.src && MUSIC.length > 0) { this.play(0); return; }
-    if (this.isPlaying) { this.audio.pause(); }
-    else { this.audio.play().catch(() => {}); }
+    if (!audio) return;
+    if (!audio.src && MUSIC.length > 0) { AudioManager.play(0); return; }
+    if (isPlaying) { audio.pause(); }
+    else { audio.play().catch(() => {}); }
   }
 
   static prev() {
-    if (MUSIC.length === 0 || !this.audio) return;
-    if (this.audio.currentTime > 3) { this.audio.currentTime = 0; return; }
-    this.play((this.currentIdx - 1 + MUSIC.length) % MUSIC.length);
+    if (MUSIC.length === 0 || !audio) return;
+    if (audio.currentTime > 3) { audio.currentTime = 0; return; }
+    AudioManager.play((currentIdx - 1 + MUSIC.length) % MUSIC.length);
   }
 
   static next(fromError) {
-    if (MUSIC.length === 0 || !this.audio) return;
-    this.play((this.currentIdx + 1) % MUSIC.length, !!fromError);
+    if (MUSIC.length === 0 || !audio) return;
+    AudioManager.play((currentIdx + 1) % MUSIC.length, !!fromError);
   }
 
   static setVolume(vol) {
-    if (!this.audio) return;
-    this.audio.volume = Math.min(Math.max(vol, 0), 1);
-    this.isMuted = this.audio.volume === 0;
-    if (!this.isMuted) this.savedVol = this.audio.volume;
+    if (!audio) return;
+    audio.volume = Math.min(Math.max(vol, 0), 1);
+    isMuted = audio.volume === 0;
+    if (!isMuted) savedVol = audio.volume;
   }
 
   static toggleMute() {
-    if (!this.audio) return;
-    if (this.isMuted) {
-      this.audio.volume = this.savedVol > 0 ? this.savedVol : 1;
-      this.isMuted = false;
+    if (!audio) return;
+    if (isMuted) {
+      audio.volume = savedVol > 0 ? savedVol : 1;
+      isMuted = false;
     } else {
-      this.savedVol = this.audio.volume;
-      this.audio.volume = 0;
-      this.isMuted = true;
+      savedVol = audio.volume;
+      audio.volume = 0;
+      isMuted = true;
     }
   }
 
   static seek(pct) {
-    if (!this.audio || !this.audio.duration) return;
-    this.audio.currentTime = (pct / 100) * this.audio.duration;
+    if (!audio || !audio.duration) return;
+    audio.currentTime = (pct / 100) * audio.duration;
   }
 
-  static getCurrentIdx() { return this.currentIdx; }
-  static getVolume() { return this.audio ? this.audio.volume : 0; }
-  static getIsPlaying() { return this.isPlaying; }
-  static getIsMuted() { return this.isMuted; }
+  static getCurrentIdx() { return currentIdx; }
+  static getVolume() { return audio ? audio.volume : 0; }
+  static getIsPlaying() { return isPlaying; }
+  static getIsMuted() { return isMuted; }
 
   static setupMediaSession() {
     if (!('mediaSession' in navigator)) return;
-    navigator.mediaSession.setActionHandler('play', () => this.toggle());
-    navigator.mediaSession.setActionHandler('pause', () => this.toggle());
-    navigator.mediaSession.setActionHandler('previoustrack', () => this.prev());
-    navigator.mediaSession.setActionHandler('nexttrack', () => this.next());
-    navigator.mediaSession.setActionHandler('seekforward', () => {
-      if (this.audio) this.audio.currentTime = Math.min(this.audio.currentTime + 10, this.audio.duration || 0);
+    var self = AudioManager;
+    navigator.mediaSession.setActionHandler('play', function () { self.toggle(); });
+    navigator.mediaSession.setActionHandler('pause', function () { self.toggle(); });
+    navigator.mediaSession.setActionHandler('previoustrack', function () { self.prev(); });
+    navigator.mediaSession.setActionHandler('nexttrack', function () { self.next(false); });
+    navigator.mediaSession.setActionHandler('seekforward', function () {
+      if (audio) audio.currentTime = Math.min(audio.currentTime + 10, audio.duration || 0);
     });
-    navigator.mediaSession.setActionHandler('seekbackward', () => {
-      if (this.audio) this.audio.currentTime = Math.max(this.audio.currentTime - 10, 0);
+    navigator.mediaSession.setActionHandler('seekbackward', function () {
+      if (audio) audio.currentTime = Math.max(audio.currentTime - 10, 0);
     });
-  }
-
-  static updateMediaSession() {
-    if (!('mediaSession' in navigator) || this.currentIdx < 0) return;
-    const title = cleanLabel(MUSIC[this.currentIdx]);
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title,
-      artist: 'Valeria\'s Book',
-      album: 'Nuestra m\u00FAsica',
-      artwork: [
-        { src: CFG.imgDir + '../favicon.svg', sizes: '64x64', type: 'image/svg+xml' },
-      ],
-    });
-    navigator.mediaSession.playbackState = this.isPlaying ? 'playing' : 'paused';
-  }
-
-  static bindAudioEvents() {
-    if (!this.audio) return;
-    const self = this;
-
-    this.audio.addEventListener('play', () => {
-      self.isPlaying = true;
-      self.updatePlayBtn();
-      self.updateMediaSession();
-      if (self.rafId) cancelAnimationFrame(self.rafId);
-      self.rafLoop();
-      EventBus.emit('music:play-state', { isPlaying: true });
-    });
-
-    this.audio.addEventListener('pause', () => {
-      self.isPlaying = false;
-      self.updatePlayBtn();
-      self.updateMediaSession();
-      if (self.rafId) { cancelAnimationFrame(self.rafId); self.rafId = 0; }
-      self.debounceSave();
-      EventBus.emit('music:play-state', { isPlaying: false });
-    });
-
-    this.audio.addEventListener('ended', () => self.next(false));
-    this.audio.addEventListener('error', () => self.handleError());
-  }
-
-  static rafLoop() {
-    if (!this.audio) return;
-    if (this.audio.duration) {
-      const pct = (this.audio.currentTime / this.audio.duration) * 100;
-      const prog = document.getElementById('mp-prog');
-      if (prog) prog.value = String(pct);
-      const cur = document.getElementById('mp-cur');
-      if (cur) cur.textContent = fmtTime(this.audio.currentTime);
-      const tot = document.getElementById('mp-tot');
-      if (tot) tot.textContent = fmtTime(this.audio.duration);
-    }
-    if (this.isPlaying) {
-      this.rafId = requestAnimationFrame(() => this.rafLoop());
-    }
-  }
-
-  static handleError() {
-    this.isLoading = false;
-    if (this.loadTimer) clearTimeout(this.loadTimer);
-    if (MUSIC.length <= 1 || this.errorSkips >= MUSIC.length - 1) {
-      const track = document.getElementById('mp-track');
-      if (track) track.textContent = 'No se pudo cargar la canci\u00F3n';
-      this.isPlaying = false;
-      this.updateUI();
-      return;
-    }
-    this.errorSkips++;
-    this.next(true);
-  }
-
-  static debounceSave() {
-    if (this.saveTimer) clearTimeout(this.saveTimer);
-    this.saveTimer = setTimeout(() => this.saveState(), CFG.saveDebounce);
-  }
-
-  static saveState() {
-    const state = {
-      idx: this.currentIdx,
-      time: this.audio ? this.audio.currentTime : 0,
-      vol: this.savedVol || (this.audio ? this.audio.volume : 1),
-      muted: this.isMuted,
-      playing: this.isPlaying,
-    };
-    StorageManager.saveMusic(state);
-  }
-
-  static restoreState() {
-    const state = StorageManager.loadMusic();
-    if (state.idx < 0 || state.idx >= MUSIC.length || !this.audio) return;
-
-    this.currentIdx = state.idx;
-    const restoredVol = Math.min(Math.max(state.vol, 0), 1);
-    this.savedVol = restoredVol > 0 ? restoredVol : 1;
-    this.isMuted = !!state.muted;
-    this.audio.volume = this.isMuted ? 0 : restoredVol;
-    this.audio.src = CFG.musicDir + encodeURIComponent(MUSIC[state.idx]);
-
-    this.audio.addEventListener('loadedmetadata', function handler() {
-      const self = AudioManager;
-      const savedTime = state.time || 0;
-      if (savedTime > 0 && self.audio && self.audio.duration) {
-        self.audio.currentTime = Math.min(savedTime, Math.max(self.audio.duration - 0.25, 0));
-      }
-      if (state.playing && !self.isMuted) {
-        self.audio?.play().catch(() => {});
-      }
-      if (self.audio) self.audio.removeEventListener('loadedmetadata', handler);
-    }, { once: true });
-
-    this.audio.load();
   }
 
   static updateUI() {
-    this.updatePlayBtn();
-    this.updatePlaylist();
-    this.updateNowPlaying();
+    updatePlayBtn();
+    updatePlaylist();
+    updateNowPlaying();
   }
+}
 
-  static updatePlayBtn() {
-    const icon = document.getElementById('mp-picon');
-    if (icon) {
-      icon.innerHTML = this.isPlaying
-        ? '<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>'
-        : '<path d="M8 5v14l11-7z"/>';
-    }
-    const btn = document.getElementById('mp-play');
-    if (btn) {
-      btn.setAttribute('aria-label', this.isPlaying ? 'Pausar' : 'Reproducir');
-      btn.classList.toggle('is-playing', this.isPlaying);
-    }
-    const eq = document.getElementById('mp-eq');
-    if (eq) eq.hidden = !this.isPlaying || this.currentIdx < 0;
-  }
+function bindAudioEvents() {
+  if (!audio) return;
+  var self = AudioManager;
+  audio.addEventListener('play', function () {
+    isPlaying = true;
+    updatePlayBtn();
+    updateMediaSession();
+    if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+    rafLoop();
+    EventBus.emit('music:play-state', { isPlaying: true });
+  });
 
-  static updatePlaylist() {
-    document.querySelectorAll('.qi').forEach((item, i) => {
-      item.classList.toggle('active', i === this.currentIdx);
-    });
-  }
+  audio.addEventListener('pause', function () {
+    isPlaying = false;
+    updatePlayBtn();
+    updateMediaSession();
+    if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+    debounceSave();
+    EventBus.emit('music:play-state', { isPlaying: false });
+  });
 
-  static updateNowPlaying() {
-    if (this.currentIdx < 0 || this.currentIdx >= MUSIC.length) return;
-    const track = document.getElementById('mp-track');
-    const artist = document.getElementById('mp-artist');
-    if (track) track.textContent = cleanLabel(MUSIC[this.currentIdx]);
-    if (artist) artist.textContent = 'Canci\u00F3n ' + (this.currentIdx + 1) + ' de ' + MUSIC.length;
+  audio.addEventListener('ended', function () { self.next(false); });
+  audio.addEventListener('error', function () { handleError(); });
+}
+
+function rafLoop() {
+  if (!audio) return;
+  if (audio.duration) {
+    var pct = (audio.currentTime / audio.duration) * 100;
+    if (progEl) progEl.value = String(pct);
+    if (curEl) curEl.textContent = fmtTime(audio.currentTime);
+    if (totEl) totEl.textContent = fmtTime(audio.duration);
   }
+  if (isPlaying) rafId = requestAnimationFrame(rafLoop);
+}
+
+function handleError() {
+  isLoading = false;
+  if (loadTimer) { clearTimeout(loadTimer); loadTimer = 0; }
+  if (MUSIC.length <= 1 || errorSkips >= MUSIC.length - 1) {
+    if (trackEl) trackEl.textContent = 'No se pudo cargar la canci\u00F3n';
+    isPlaying = false;
+    AudioManager.updateUI();
+    return;
+  }
+  errorSkips++;
+  AudioManager.next(true);
+}
+
+function debounceSave() {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveState, CFG.saveDebounce);
+}
+
+function saveState() {
+  var state = {
+    idx: currentIdx,
+    time: audio ? audio.currentTime : 0,
+    vol: savedVol || (audio ? audio.volume : 1),
+    muted: isMuted,
+    playing: isPlaying,
+  };
+  StorageManager.saveMusic(state);
+}
+
+function restoreState() {
+  var state = StorageManager.loadMusic();
+  if (state.idx < 0 || state.idx >= MUSIC.length || !audio) return;
+  currentIdx = state.idx;
+  var restoredVol = Math.min(Math.max(state.vol, 0), 1);
+  savedVol = restoredVol > 0 ? restoredVol : 1;
+  isMuted = !!state.muted;
+  audio.volume = isMuted ? 0 : restoredVol;
+
+  /* restore saved time position but NEVER auto-play */
+  if (state.time > 0) {
+    audio.src = CFG.musicDir + encodeURIComponent(MUSIC[state.idx]);
+    audio.addEventListener('loadedmetadata', function handler() {
+      var savedTime = state.time || 0;
+      if (savedTime > 0 && audio && audio.duration) {
+        audio.currentTime = Math.min(savedTime, Math.max(audio.duration - 0.25, 0));
+      }
+      if (audio) audio.removeEventListener('loadedmetadata', handler);
+    }, { once: true });
+    audio.load();
+  }
+}
+
+function updatePlayBtn() {
+  if (piconEl) {
+    piconEl.innerHTML = isPlaying
+      ? '<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>'
+      : '<path d="M8 5v14l11-7z"/>';
+  }
+  if (playBtnEl) {
+    playBtnEl.setAttribute('aria-label', isPlaying ? 'Pausar' : 'Reproducir');
+    playBtnEl.classList.toggle('is-playing', isPlaying);
+  }
+  if (eqEl) eqEl.hidden = !isPlaying || currentIdx < 0;
+}
+
+function updatePlaylist() {
+  document.querySelectorAll('.qi').forEach((item, i) => {
+    item.classList.toggle('active', i === currentIdx);
+  });
+}
+
+function updateNowPlaying() {
+  if (currentIdx < 0 || currentIdx >= MUSIC.length) return;
+  if (trackEl) trackEl.textContent = cleanLabel(MUSIC[currentIdx]);
+  if (artistEl) artistEl.textContent = 'Canci\u00F3n ' + (currentIdx + 1) + ' de ' + MUSIC.length;
+}
+
+function updateMediaSession() {
+  if (!('mediaSession' in navigator) || currentIdx < 0) return;
+  const title = cleanLabel(MUSIC[currentIdx]);
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title,
+    artist: 'Valeria\'s Book',
+    album: 'Nuestra m\u00FAsica',
+    artwork: [{ src: '/favicon.svg', sizes: '64x64', type: 'image/svg+xml' }],
+  });
+  navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
 }

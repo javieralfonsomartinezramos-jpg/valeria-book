@@ -19,14 +19,6 @@ export function setIsFlipping(v) {
   state.flipPhase = v ? 'flipping' : 'idle';
 }
 
-export function isFirstSpread() {
-  return state.currentSpread === 0;
-}
-
-export function isLastSpread() {
-  return state.currentSpread >= TOTAL_SPREADS - 1;
-}
-
 export function getCurrentSpread() { return state.currentSpread; }
 export function getIsFlipping() { return state.isFlipping; }
 
@@ -35,13 +27,6 @@ export function setCurrentSpread(n) {
   state.currentSpread = n;
   Logger.info('BookState', `Spread → ${n}`);
 }
-
-export function setFlipPhase(phase) {
-  state.flipPhase = phase;
-  state.isFlipping = phase !== 'idle';
-}
-
-export function setFlipDirection() {}
 
 export function canGoNext() {
   return state.currentSpread < TOTAL_SPREADS - 1;
@@ -57,8 +42,4 @@ export function completeNavigation(dir) {
   state.flipPhase = 'idle';
 }
 
-export function resetState() {
-  state.currentSpread = 0;
-  state.isFlipping = false;
-  state.flipPhase = 'idle';
-}
+

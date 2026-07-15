@@ -1,16 +1,11 @@
 import { CFG, TOTAL_SPREADS } from '../config.js';
 import { EventBus } from '../core/EventBus.js';
-import { Logger } from '../core/Logger.js';
-import { completeNavigation, getCurrentSpread, getIsFlipping, setIsFlipping, getBookElement, isLastSpread, isFirstSpread } from '../core/BookState.js';
-import { renderPage } from './BookEngine.js';
+import { completeNavigation, getCurrentSpread, getIsFlipping, setIsFlipping, getBookElement } from '../core/BookState.js';
+import { renderSpread, showCurrentSpread } from './BookEngine.js';
 
 let flipTimeline = null;
 
-export function getFlipTimeline() {
-  return flipTimeline;
-}
-
-function createPageTurn(dir) {
+function createFlipPage(dir) {
   const flipEl = document.getElementById('flip-page');
   const bookEl = getBookElement();
   if (!flipEl || !bookEl) return null;
@@ -20,31 +15,38 @@ function createPageTurn(dir) {
 
   const curIdx = getCurrentSpread();
   const nextIdx = curIdx + dir;
+  if (nextIdx < 0 || nextIdx >= TOTAL_SPREADS) return null;
 
   flipEl.style.display = 'block';
   flipEl.style.width = w + 'px';
   flipEl.style.height = h + 'px';
   flipEl.style.zIndex = '10';
+  flipEl.style.top = '0';
+  flipEl.style.left = dir === 1 ? '0' : (w * 0.5) + 'px';
+  flipEl.style.transformOrigin = 'left center';
+  flipEl.style.transform = 'perspective(' + CFG.flipPerspective + 'px) rotateY(0deg)';
 
-  if (dir === 1) {
-    flipEl.style.top = '0';
-    flipEl.style.left = '0';
-    flipEl.style.transformOrigin = 'left center';
-    flipEl.style.transform = 'perspective(' + CFG.flipPerspective + 'px) rotateY(0deg)';
-    flipEl.innerHTML = '';
-    const content = renderPage(nextIdx);
-    if (content) flipEl.appendChild(content);
-  } else {
-    flipEl.style.top = '0';
-    flipEl.style.left = (w * 0.5) + 'px';
-    flipEl.style.transformOrigin = 'left center';
-    flipEl.style.transform = 'perspective(' + CFG.flipPerspective + 'px) rotateY(0deg)';
-    flipEl.innerHTML = '';
-    const content = renderPage(curIdx - 1);
-    if (content) flipEl.appendChild(content);
+  const targetIdx = dir === 1 ? nextIdx : curIdx - 1;
+  flipEl.innerHTML = '';
+  renderSpread(targetIdx);
+  const spreadEl = bookEl.querySelector('.book-spread[data-spread="' + targetIdx + '"]');
+  if (spreadEl) {
+    const clone = spreadEl.cloneNode(true);
+    clone.classList.remove('active');
+    clone.style.position = 'absolute';
+    clone.style.top = '0';
+    clone.style.left = '0';
+    clone.style.width = '100%';
+    clone.style.height = '100%';
+    clone.style.pointerEvents = 'none';
+    clone.querySelectorAll('.p-img-lazy').forEach(img => {
+      const src = img.dataset.src || img.src;
+      if (src && !img.src) img.src = src;
+    });
+    flipEl.appendChild(clone);
   }
 
-  return { w, h, flipEl };
+  return { w, flipEl };
 }
 
 export function navigateWithFlip(dir, onComplete) {
@@ -54,6 +56,7 @@ export function navigateWithFlip(dir, onComplete) {
   if (next < 0 || next >= TOTAL_SPREADS) return;
 
   setIsFlipping(true);
+  EventBus.emit('audiofx:page-turn');
 
   if (window.gsap) {
     gsapFlipNavigate(dir, onComplete);
@@ -63,10 +66,10 @@ export function navigateWithFlip(dir, onComplete) {
 }
 
 function gsapFlipNavigate(dir, onComplete) {
-  const info = createPageTurn(dir);
+  const info = createFlipPage(dir);
   if (!info) { instantNavigate(dir, onComplete); return; }
-  const { w, flipEl } = info;
-  const dur = CFG.flipDuration;
+  const { flipEl } = info;
+  const dur = CFG.flipDuration / 1000;
 
   const tl = gsap.timeline({
     onComplete: () => {
@@ -74,27 +77,19 @@ function gsapFlipNavigate(dir, onComplete) {
       flipEl.innerHTML = '';
       completeNavigation(dir);
       setIsFlipping(false);
+      renderSpread(getCurrentSpread());
+      showCurrentSpread();
       if (onComplete) onComplete();
-    }
+    },
   });
 
-  if (dir === 1) {
-    tl.to(flipEl, {
-      rotationY: -180,
-      duration: dur,
-      ease: 'power2.inOut',
-      transformOrigin: 'left center',
-      transformPerspective: CFG.flipPerspective,
-    });
-  } else {
-    tl.to(flipEl, {
-      rotationY: 180,
-      duration: dur,
-      ease: 'power2.inOut',
-      transformOrigin: 'left center',
-      transformPerspective: CFG.flipPerspective,
-    });
-  }
+  tl.to(flipEl, {
+    rotationY: dir === 1 ? -180 : 180,
+    duration: dur,
+    ease: 'power2.inOut',
+    transformOrigin: 'left center',
+    transformPerspective: CFG.flipPerspective,
+  });
 
   flipTimeline = tl;
 }
@@ -102,24 +97,7 @@ function gsapFlipNavigate(dir, onComplete) {
 function instantNavigate(dir, onComplete) {
   completeNavigation(dir);
   setIsFlipping(false);
+  renderSpread(getCurrentSpread());
+  showCurrentSpread();
   if (onComplete) onComplete();
-}
-
-export function animateCornerFold(pageEl, corner) {
-  if (!pageEl || !window.gsap) return;
-  const w = pageEl.offsetWidth || 300;
-  gsap.fromTo(pageEl,
-    {
-      rotationY: corner === 'tl' ? -30 : 30,
-      transformOrigin: corner.indexOf('l') !== -1 ? 'left center' : 'right center',
-      transformPerspective: 1200,
-      opacity: 0.85,
-    },
-    {
-      rotationY: 0,
-      opacity: 1,
-      duration: 0.25,
-      ease: 'power2.out',
-    }
-  );
 }
