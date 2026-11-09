@@ -101,6 +101,8 @@
   box-shadow:
     0 22px 70px rgba(0,0,0,0.38),
     0 0 0 1px rgba(229,199,141,0.16) inset;
+  touch-action: pan-y;
+  user-select: none;
 }
 
 .book-cover-front {
@@ -354,8 +356,21 @@
 
 .pg-body {
   flex: 1;
-  overflow: hidden;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: var(--space-md);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(143,71,60,0.42) transparent;
+}
+
+.pg-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.pg-body::-webkit-scrollbar-thumb {
+  background: rgba(143,71,60,0.42);
+  border-radius: 999px;
 }
 
 .pg-body > .content-enter {
@@ -373,6 +388,10 @@
 .pg-body > .content-enter > *:nth-child(5) { animation-delay: 0.18s; }
 .pg-body > .content-enter > *:nth-child(6) { animation-delay: 0.22s; }
 .pg-body > .content-enter > *:nth-child(7) { animation-delay: 0.26s; }
+
+.pg-body > div {
+  min-height: 100%;
+}
 
 .pg-num {
   position: absolute;

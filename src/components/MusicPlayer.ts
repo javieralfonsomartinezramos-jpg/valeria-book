@@ -46,6 +46,27 @@ export class MusicPlayer {
     if (uiInited) return;
     uiInited = true;
 
+    const dock = DOMManager.get('music-dock');
+    const source = document.querySelector<HTMLTemplateElement>('template[data-name="music"]');
+    if (dock && source) {
+      dock.appendChild(source.content.cloneNode(true));
+      dock.hidden = false;
+
+      const playlistToggle = document.createElement('button');
+      playlistToggle.type = 'button';
+      playlistToggle.className = 'music-dock-toggle';
+      playlistToggle.setAttribute('aria-expanded', 'false');
+      playlistToggle.setAttribute('aria-label', 'Mostrar lista de canciones');
+      playlistToggle.title = 'Lista de canciones';
+      playlistToggle.innerHTML = '<span aria-hidden="true">☷</span>';
+      playlistToggle.addEventListener('click', () => {
+        const expanded = dock.classList.toggle('is-expanded');
+        playlistToggle.setAttribute('aria-expanded', String(expanded));
+        playlistToggle.setAttribute('aria-label', expanded ? 'Ocultar lista de canciones' : 'Mostrar lista de canciones');
+      });
+      dock.appendChild(playlistToggle);
+    }
+
     AudioManager.refreshUI();
 
     const queue = DOMManager.get('mp-queue');
@@ -68,6 +89,17 @@ export class MusicPlayer {
         queue.appendChild(item);
       });
     }
+
+    EventBus.on('music:track-invalid', data => {
+      const index = (data as { index?: number })?.index;
+      if (typeof index !== 'number') return;
+      const item = queue?.querySelector<HTMLElement>('.qi[data-idx="' + index + '"]');
+      if (!item) return;
+      item.classList.add('is-unavailable');
+      item.setAttribute('aria-disabled', 'true');
+      item.setAttribute('title', 'Esta canción no se pudo cargar y fue ocultada');
+      setTimeout(() => item.remove(), 250);
+    });
 
     DOMManager.onClick('#mp-play', () => AudioManager.toggle());
     DOMManager.onClick('#mp-prev', () => AudioManager.prev());

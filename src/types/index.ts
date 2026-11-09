@@ -20,6 +20,12 @@ export interface MusicTrack {
   artist: string;
 }
 
+export interface NoteEntry {
+  name: string;
+  text: string;
+  createdAt: string;
+}
+
 export interface Chapter {
   label: string;
   spread: number;

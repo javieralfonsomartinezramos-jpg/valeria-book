@@ -14,11 +14,18 @@ const _fW = <TArgs extends unknown[], TReturn>(fn: (...args: TArgs) => TReturn, 
 };
 
 import './styles/main.scss';
+import { gsap } from 'gsap';
 
 import { Portal } from './components/Portal.js';
 import { StartupManager } from './managers/StartupManager.js';
 
+// La aplicación usa GSAP de forma opcional en los componentes de portada y
+// de cambio de página. Registrarlo aquí evita que el libro caiga siempre en
+// la navegación instantánea cuando se ejecuta con Vite.
+window.gsap = gsap;
+
 function _f_init(): void {
+  Portal.init();
   console.log(`%c[FORENSIC] getElementById('portal-btn') — js/main.js`, 'color:#f28b9e;font-weight:bold');
   const btn = document.getElementById('portal-btn');
   if (btn) {

@@ -17,9 +17,20 @@ import { Lightbox } from '../components/Lightbox';
 import { Sidebar } from '../components/Sidebar';
 import { AudioManager } from '../services/AudioManager';
 import { AudioFXService } from '../services/AudioFXService';
+import { MusicPlayer } from '../components/MusicPlayer';
 
 let started = false;
 let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+
+function applyDeviceMode(): void {
+  const width = window.innerWidth;
+  const isTouch = window.matchMedia?.('(pointer: coarse)').matches ?? false;
+  const device = width < 640 ? 'mobile' : width < 1024 ? 'tablet' : 'desktop';
+  const root = document.documentElement;
+  root.dataset.device = device;
+  root.dataset.input = isTouch ? 'touch' : 'mouse';
+  root.dataset.orientation = window.innerHeight >= window.innerWidth ? 'portrait' : 'landscape';
+}
 
 function applyContrast(enabled: boolean): void {
   const root = document.documentElement;
@@ -47,6 +58,7 @@ function phase1Config(): void {
   DOMManager.init();
   detectLowPerf();
   document.documentElement.setAttribute('data-mobile', isMobile() ? 'true' : 'false');
+  applyDeviceMode();
   applyContrast(StorageManager.getContrast());
 }
 
@@ -95,6 +107,44 @@ function phase5Interface(): void {
       setTimeout(() => { allowGesture(); Lightbox.open(idx); }, 120);
     });
   });
+
+  setupBookGestures();
+}
+
+function setupBookGestures(): void {
+  const book = DOMManager.get('book');
+  if (!book || book.dataset.gesturesReady === 'true') return;
+
+  let startX = 0;
+  let startY = 0;
+  let pointerId: number | null = null;
+
+  book.dataset.gesturesReady = 'true';
+  book.addEventListener('pointerdown', event => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    startX = event.clientX;
+    startY = event.clientY;
+    pointerId = event.pointerId;
+    book.setPointerCapture?.(event.pointerId);
+  });
+
+  book.addEventListener('pointerup', event => {
+    if (pointerId !== event.pointerId) return;
+    pointerId = null;
+
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
+    const distance = Math.abs(dx);
+    const isHorizontal = distance > Math.abs(dy) * 1.25;
+    if (!isHorizontal || distance < 48 || getIsFlipping()) return;
+
+    if (dx < 0 && canGoNext()) navigateWithFlip(1);
+    if (dx > 0 && canGoPrev()) navigateWithFlip(-1);
+  });
+
+  book.addEventListener('pointercancel', () => {
+    pointerId = null;
+  });
 }
 
 function phase6Events(): void {
@@ -111,7 +161,7 @@ function phase6Events(): void {
   EventBus.on('audiofx:page-turn', () => AudioFXService.play());
 
   EventBus.on('ui:reach-music', () => {
-    import('../components/MusicPlayer').then(m => m.MusicPlayer.initUI()).catch(() => {});
+    MusicPlayer.initUI();
   });
   EventBus.on('ui:reach-notes', () => {
     import('../components/Notes').then(m => m.Notes.render()).catch(() => {});
@@ -141,6 +191,7 @@ function phase7Audio(): void {
 function phase8Secondary(): void {
   Logger.info('Startup', 'Phase 8/9 — Secondary');
   Sidebar.init();
+  MusicPlayer.initUI();
   AudioManager.updateUI();
 }
 
@@ -158,8 +209,11 @@ function phase9Effects(): void {
         document.documentElement.setAttribute('data-mobile', mob ? 'true' : 'false');
         renderSpread();
       }
+      applyDeviceMode();
     }, 150);
   });
+
+  window.addEventListener('orientationchange', applyDeviceMode, { passive: true });
 }
 
 async function runPhase(id: number, name: string, fn: () => void | Promise<void>): Promise<void> {

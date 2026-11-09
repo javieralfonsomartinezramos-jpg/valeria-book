@@ -46,6 +46,20 @@
   font-size: var(--text-sm);
 }
 
+.pg-body {
+  padding: clamp(0.8rem, 3vw, 1.35rem);
+  -webkit-overflow-scrolling: touch;
+}
+
+.p-letter {
+  line-height: 1.68;
+}
+
+.p-phrase {
+  font-size: clamp(0.88rem, 3.4vw, 1.05rem);
+  line-height: 1.55;
+}
+
 .p-image {
   padding: var(--space-xs);
 }
@@ -84,6 +98,15 @@
   .ps-right {
     width: 100%;
     left: 0;
+  }
+
+  .p-letter {
+    font-size: clamp(0.88rem, 1.55vw, 1rem);
+    line-height: 1.72;
+  }
+
+  .p-phrase {
+    font-size: clamp(0.95rem, 1.8vw, 1.15rem);
   }
 }
 
@@ -162,6 +185,10 @@
 
   .p-thanks {
     padding: var(--space-md);
+  }
+
+  .pg-body {
+    padding: clamp(1rem, 1.8vw, 1.5rem);
   }
 }
 

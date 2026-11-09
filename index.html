@@ -105,6 +105,9 @@
       </nav>
     </header>
 
+    <!-- Reproductor independiente: acompaña al libro sin ocupar una página. -->
+    <aside id="music-dock" class="music-dock" aria-label="Reproductor de música" hidden></aside>
+
     <aside id="sidebar" role="navigation" aria-label="Indice del libro" hidden>
       <div class="sidebar-head">
         <h2>Contenido</h2>
@@ -331,9 +334,13 @@
                 </section>
                 <hr class="final-hr" aria-hidden="true">
                 <section class="final-notes">
-                  <p class="notes-intro">Escribe aquí tus pensamientos, como anotando en los márgenes...</p>
-                  <textarea class="notes-ta" id="notes-ta" placeholder="Escribe algo bonito..." aria-label="Notas personales"></textarea>
-                  <button class="btn-sec" id="notes-save">Guardar nota</button>
+                  <p class="notes-intro">Deja un mensaje para Valeria. Tu nombre aparecerá junto a lo que escribas.</p>
+                  <label class="notes-label" for="notes-name">Tu nombre</label>
+                  <input class="notes-name" id="notes-name" type="text" maxlength="40" placeholder="¿Quién escribe?" autocomplete="name">
+                  <label class="notes-label" for="notes-ta">Tu mensaje</label>
+                  <textarea class="notes-ta" id="notes-ta" maxlength="500" placeholder="Escribe algo bonito..." aria-label="Mensaje personal"></textarea>
+                  <button class="btn-sec" id="notes-save">Publicar mensaje</button>
+                  <p class="notes-status" id="notes-status" role="status" aria-live="polite"></p>
                   <div class="notes-list" id="notes-list"></div>
                 </section>
                 <hr class="final-hr" aria-hidden="true">

@@ -143,7 +143,12 @@ function _f_createPageContent(pageIndex: number): DocumentFragment | null {
   }
 
   const musicP = SPREAD_MUSIC * 2;
-  if (pageIndex === musicP) return cloneTemplate('template[data-name="music"]');
+  if (pageIndex === musicP) {
+    return createLetterPage(
+      '<div class="p-music-note"><span class="p-music-note-icon">♫</span><p class="p-music-note-title">Nuestra música</p><p>Deja que estas canciones acompañen cada página de nuestra historia.</p><p class="p-music-note-hint">El reproductor permanece fuera del libro para que puedas cambiar de canción mientras sigues leyendo.</p></div>',
+      pageIndex,
+    );
+  }
   const notesP = SPREAD_NOTES * 2;
   if (pageIndex === notesP) return cloneTemplate('template[data-name="notes"]');
   if (pageIndex === notesP + 1) return cloneTemplate('template[data-name="thanks-page"]');

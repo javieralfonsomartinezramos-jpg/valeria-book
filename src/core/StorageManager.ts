@@ -1,4 +1,4 @@
-import type { MusicState } from '../types';
+import type { MusicState, NoteEntry } from '../types';
 import { Logger } from './Logger';
 
 console.log(`%c[FORENSIC] MODULE LOADED — js/core/StorageManager.js`, 'color:#27ae60;font-weight:bold');
@@ -45,11 +45,24 @@ export class StorageManager {
     this.set('favs', favs);
   }
 
-  static getNotes(): string[] {
-    return this.get('notes', []);
+  static getNotes(): NoteEntry[] {
+    const saved = this.get<unknown[]>('notes', []);
+    return saved.flatMap(note => {
+      if (typeof note === 'string') {
+        return [{ name: 'Anónimo', text: note, createdAt: new Date().toISOString() }];
+      }
+      if (!note || typeof note !== 'object') return [];
+      const entry = note as Partial<NoteEntry>;
+      if (typeof entry.text !== 'string' || typeof entry.name !== 'string') return [];
+      return [{
+        name: entry.name,
+        text: entry.text,
+        createdAt: typeof entry.createdAt === 'string' ? entry.createdAt : new Date().toISOString(),
+      }];
+    });
   }
 
-  static setNotes(notes: string[]) {
+  static setNotes(notes: NoteEntry[]) {
     this.set('notes', notes);
   }
 

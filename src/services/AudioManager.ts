@@ -63,8 +63,12 @@ function rafLoop(): void {
 }
 
 function handleError(): void {
+  const failedIdx = currentIdx;
   isLoading = false;
   if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
+  if (failedIdx >= 0) {
+    EventBus.emit('music:track-invalid', { index: failedIdx });
+  }
   if (MUSIC.length <= 1 || errorSkips >= MUSIC.length - 1) {
     if (trackEl) trackEl.textContent = 'No se pudo cargar la canción';
     isPlaying = false;
