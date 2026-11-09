@@ -56,6 +56,9 @@ export class ImageManager {
     imgEl.dataset.idx = String(imgIdx);
     imgEl.alt = 'Recuerdo ' + (imgIdx + 1);
     imgEl.className = 'p-img-lazy';
+    imgEl.loading = 'lazy';
+    imgEl.decoding = 'async';
+    imgEl.fetchPriority = 'low';
 
     imgEl.addEventListener('load', function onLoad() {
       this.classList.add('loaded');
@@ -94,6 +97,7 @@ export class ImageManager {
       if (img.src && img.src !== '') continue;
       const src = img.dataset.src;
       if (!src) continue;
+      img.removeAttribute('data-src');
       img.src = src;
     }
   }
@@ -104,8 +108,8 @@ export class ImageManager {
     imgs.forEach(img => {
       const src = img.src;
       img.removeAttribute('src');
+      img.dataset.src = src;
       img.classList.remove('loaded');
-      if (src) URL.revokeObjectURL?.(src);
     });
   }
 }

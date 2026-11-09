@@ -190,6 +190,8 @@
   height: 100%; padding: var(--space-sm);
   cursor: pointer;
   transition: opacity 0.3s ease;
+  position: relative;
+  isolation: isolate;
 }
 
 .p-image:hover {
@@ -208,6 +210,40 @@
     0 0 0 8px rgba(255,255,255,0.42),
     0 0 0 9px rgba(44,24,16,0.07);
   filter: sepia(0.08) contrast(0.98);
+  pointer-events: none;
+  user-select: none;
+}
+
+.p-image .p-img-lazy:not(.loaded) {
+  opacity: 0;
+}
+
+.p-img-placeholder {
+  position: absolute;
+  inset: var(--space-sm) var(--space-sm) 2.5rem;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  color: var(--page-muted);
+  background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(140,92,65,.08));
+  border-radius: 2px;
+}
+
+.p-img-loader {
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 2px solid rgba(151, 75, 67, .18);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .9s linear infinite;
+}
+
+.p-img-error {
+  font: italic var(--text-xs) var(--font-serif);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .p-image:hover img {

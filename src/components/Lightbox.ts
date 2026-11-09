@@ -224,6 +224,8 @@ export class Lightbox {
       item.setAttribute('aria-label', 'Abrir favorita ' + (idx + 1));
       const el = document.createElement('img');
       el.loading = 'lazy';
+      el.decoding = 'async';
+      el.fetchPriority = 'low';
       el.src = img.path;
       el.alt = 'Favorita';
       el.addEventListener('error', function() { this.alt = 'Sin imagen'; this.style.display = 'none'; }, { once: true });

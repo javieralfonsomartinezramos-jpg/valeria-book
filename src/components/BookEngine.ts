@@ -82,8 +82,8 @@ function _f_destroySpread(spreadIdx: number): void {
     const htmlImg = img as HTMLImageElement;
     const src = htmlImg.src;
     htmlImg.removeAttribute('src');
+    if (src) htmlImg.dataset.src = src;
     htmlImg.classList.remove('loaded');
-    if (src) URL.revokeObjectURL?.(src);
   });
   el.innerHTML = '';
   el.remove();
