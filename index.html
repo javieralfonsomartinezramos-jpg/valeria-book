@@ -34,11 +34,7 @@
   <link rel="apple-touch-icon" href="favicon.svg">
   <link rel="manifest" href="manifest.webmanifest">
 
-  <link rel="stylesheet" href="css/main.css">
-
-  <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous">
-
-  <style>/* critical */body{background:#0f0a0d;color:#faf5f0;margin:0;font-family:Inter,sans-serif}.loader,.portal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center}.loader{background:#0f0a0d;z-index:1001}.portal{background:linear-gradient(135deg,#1a0f14,#0f0a0d);flex-direction:column}.portal-heart{font-size:3rem;color:#e8d5a3}.portal-title{font-size:1.6rem;font-family:Playfair Display,Georgia,serif;color:#e8d5a3;text-align:center;margin:.5rem 0}.portal-btn{background:transparent;border:1px solid #f28b9e;color:#f28b9e;padding:.75rem 2rem;border-radius:2rem;cursor:pointer;font-size:1rem;font-family:inherit;margin-top:1rem}.loader-heart{font-size:2rem;color:#f28b9e;animation:pulse 1.2s ease-in-out infinite}@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.7}}.loader-bar-track{width:200px;height:2px;background:#2c1810;border-radius:1px;margin-top:1rem;overflow:hidden}.loader-bar-fill{height:100%;background:#f28b9e;border-radius:1px;transition:width .3s}.loader-pct{font-size:.75rem;color:#8a5a4a;margin-top:.5rem}</style>
+  <style>/* critical */body{background:#15100f;color:#f7efe3;margin:0;font-family:Inter,sans-serif}.loader,.portal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}.loader{background:#15100f;z-index:900}.portal{z-index:1000;background:linear-gradient(120deg,#15100f,#211319 58%,#101722);padding:24px}.portal-book-cover{position:relative;width:min(88vw,430px);min-height:min(84dvh,640px);border:1px solid rgba(229,199,141,.36);background:#55283a;color:#f6ead4;box-shadow:0 28px 90px rgba(0,0,0,.52),inset 18px 0 22px rgba(0,0,0,.22);display:grid;grid-template-rows:minmax(190px,42%) 1fr}.portal-cover-photo{margin:24px 24px 0;border:1px solid rgba(246,234,212,.26);overflow:hidden;background:#1b1412}.portal-cover-photo img{width:100%;height:100%;object-fit:cover;display:block}.portal-cover-copy{padding:26px 34px 34px;text-align:center}.portal-kicker{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#e5c78d}.portal-title{font-size:2.4rem;font-family:Playfair Display,Georgia,serif;color:#f7efe3;margin:.4rem 0}.portal-btn{background:#f1dfbd;color:#2b1716;border:1px solid #f1dfbd;padding:.85rem 1.5rem;cursor:pointer;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;margin-top:1rem}.loader-heart{font-size:1rem;color:#e5c78d;letter-spacing:.16em;text-transform:uppercase;animation:pulse 1.2s ease-in-out infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}.loader-bar-track{width:200px;height:2px;background:#32231e;margin-top:1rem;overflow:hidden}.loader-bar-fill{height:100%;background:#e5c78d;transition:width .3s}.loader-pct{font-size:.75rem;color:#9b7d62;margin-top:.5rem}</style>
 
   <!-- Preload critical resources -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,25 +49,26 @@
 </head>
 <body>
 
-  <div id="portal" class="portal" role="dialog" aria-label="Entrada al libro" aria-modal="true">
-    <div class="portal-bg" aria-hidden="true">
-      <div class="portal-bg-glow pg1"></div>
-      <div class="portal-bg-glow pg2"></div>
-      <div class="portal-bg-glow pg3"></div>
-    </div>
-    <div class="portal-content">
-      <div class="portal-heart-wrap" aria-hidden="true">
-        <span class="portal-heart">&hearts;</span>
+  <div id="portal" class="portal" role="dialog" aria-label="Portada de Valeria's Book" aria-modal="true">
+    <div class="portal-stage" aria-hidden="true"></div>
+    <div class="portal-book-cover">
+      <span class="portal-cover-spine" aria-hidden="true"></span>
+      <figure class="portal-cover-photo">
+        <img src="images/para_mi_nino_lindo__2026-06-26_12.00.44_AM (2)_00001.webp" alt="Recuerdo ilustrado de Valeria's Book">
+      </figure>
+      <div class="portal-cover-copy">
+        <p class="portal-kicker">Libro de dedicatoria</p>
+        <h1 class="portal-title">Valeria's Book</h1>
+        <p class="portal-dedication">Para Valeria, con todo mi amor</p>
+        <p class="portal-sub">Hay historias que se leen despacio, como una carta guardada entre páginas.</p>
+        <button class="portal-btn" id="portal-btn">Abrir el libro</button>
+        <p class="portal-hint">Una historia de recuerdos, canciones y palabras</p>
       </div>
-      <p class="portal-title">Hay una historia escrita para ti...</p>
-      <p class="portal-sub">Un libro de recuerdos, canciones y palabras que esperan ser descubiertas. ¿La abrimos juntos?</p>
-      <button class="portal-btn" id="portal-btn">Sí, quiero leerlo</button>
-      <p class="portal-hint">Toca para empezar</p>
     </div>
   </div>
 
   <div id="loader" class="loader" role="progressbar" aria-label="Cargando" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-    <div class="loader-heart">&hearts;</div>
+    <div class="loader-heart">Valeria's Book</div>
     <div class="loader-bar-track">
       <div class="loader-bar-fill" id="loader-fill" style="width:0%"></div>
     </div>
@@ -126,7 +123,7 @@
 
           <div class="book-cover-front" aria-hidden="true">
             <div class="cover-emboss">
-              <span class="cover-heart">&hearts;</span>
+              <span class="cover-kicker">Libro de recuerdos</span>
               <span class="cover-title">Valeria's Book</span>
               <span class="cover-subtitle">Para Valeria, con todo mi amor</span>
             </div>
@@ -166,10 +163,20 @@
           <div id="templates" hidden>
             <template data-page="0">
               <div class="p-cover-spread">
-                <span class="p-cover-heart" aria-hidden="true">&hearts;</span>
+                <span class="p-cover-kicker">Libro de dedicatoria</span>
                 <h1 class="p-cover-title">Valeria's Book</h1>
                 <p class="p-cover-sub">Para Valeria, con todo mi amor</p>
+                <p class="p-cover-line">Una carta, un álbum y una promesa escrita despacio.</p>
                 <time class="p-cover-date">&mdash; 2026 &mdash;</time>
+              </div>
+            </template>
+
+            <template data-page="cover-note">
+              <div class="p-opening-note">
+                <p class="p-opening-label">Antes de empezar</p>
+                <p>Este libro guarda recuerdos, canciones y palabras que no quería dejar perdidas en una conversación.</p>
+                <p>Está hecho para leerse despacio, como se miran las fotos importantes y como se vuelven a abrir las cartas que todavía laten.</p>
+                <p class="p-opening-signature">&mdash; Javi</p>
               </div>
             </template>
 
@@ -331,7 +338,7 @@
                 </section>
                 <hr class="final-hr" aria-hidden="true">
                 <section class="g-favs" id="g-favs" hidden>
-                  <h3 class="g-favs-title">&hearts; Tus favoritas</h3>
+                  <h3 class="g-favs-title">Tus favoritas</h3>
                   <div class="g-favs-grid" id="g-favs-grid"></div>
                 </section>
               </div>
@@ -376,102 +383,8 @@
     </div>
 
     <audio id="audio" preload="metadata" aria-hidden="true"></audio>
-    <audio id="sfx" preload="auto" aria-hidden="true"></audio>
   </div>
 
-  <!-- ⏱ FORENSIC: GSAP load tracking -->
-  <script>
-    (function(){
-      var _t0 = performance.now();
-      console.log('%c⏱ [FORENSIC] index.html — HTML parsing complete', 'color:#f28b9e;font-weight:bold');
-      window.__FORENSIC_T0 = _t0;
-      window.__FORENSIC_GSAP_LOADING = true;
-      window.__FORENSIC_EVENTS = [];
-      function e(name, data) { window.__FORENSIC_EVENTS.push({name:name,data:data||{},t:performance.now()-_t0}); }
-      e('html-parsed');
-
-      window.onerror = function(msg, url, line, col, err) {
-        console.error('%c🚨 [FORENSIC] onerror: ' + msg + ' at ' + url + ':' + line + ':' + col, 'color:#c0392b;font-weight:bold');
-        if(err && err.stack) console.error(err.stack);
-        e('onerror',{msg:msg,url:url,line:line,col:col});
-        return true;
-      };
-
-      window.onunhandledrejection = function(event) {
-        console.error('%c🚨 [FORENSIC] onunhandledrejection: ' + (event.reason?.message || event.reason), 'color:#c0392b;font-weight:bold');
-        if(event.reason?.stack) console.error(event.reason.stack);
-        e('onunhandledrejection',{reason:event.reason?.message||String(event.reason)});
-      };
-
-      document.addEventListener('readystatechange', function(){
-        e('readystatechange:'+document.readyState);
-        console.log('%c⏱ [FORENSIC] readystatechange → ' + document.readyState + ' at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#f28b9e');
-        if(document.readyState === 'interactive') {
-          console.log('%c⏱ [FORENSIC] DOMContentLoaded (via readystatechange) at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#f28b9e');
-        }
-        if(document.readyState === 'complete') {
-          console.log('%c⏱ [FORENSIC] page fully loaded (via readystatechange) at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#f28b9e');
-        }
-      });
-
-      document.addEventListener('DOMContentLoaded', function(){
-        e('DOMContentLoaded');
-        console.log('%c⏱ [FORENSIC] DOMContentLoaded event at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#f28b9e;font-weight:bold');
-
-        /* Verify loader DOM elements exist at DOMContentLoaded */
-        var _els = [
-          ['#loader', document.getElementById('loader')],
-          ['#loader-fill', document.getElementById('loader-fill')],
-          ['#loader-pct', document.getElementById('loader-pct')],
-          ['#portal', document.getElementById('portal')],
-          ['#portal-btn', document.getElementById('portal-btn')],
-          ['#book', document.getElementById('book')],
-          ['#app', document.getElementById('app')],
-          ['#audio', document.getElementById('audio')],
-          ['#sfx', document.getElementById('sfx')],
-        ];
-        var _allFound = true;
-        for(var _i=0; _i<_els.length; _i++) {
-          var _id = _els[_i][0], _el = _els[_i][1];
-          if(_el) {
-            console.log('  ✓ [FORENSIC] Element ' + _id + ' — FOUND');
-          } else {
-            console.error('  ✗ [FORENSIC] Element ' + _id + ' — NULL ⚠️');
-            _allFound = false;
-          }
-        }
-        if(_allFound) console.log('%c  ✓ [FORENSIC] ALL critical DOM elements present at DOMContentLoaded', 'color:#27ae60;font-weight:bold');
-        e('dom-check',{allFound:_allFound});
-
-        /* Check CSS variable --rose availability */
-        var _style = getComputedStyle(document.documentElement);
-        var _rose = _style.getPropertyValue('--rose');
-        if(_rose) {
-          console.log('  ✓ [FORENSIC] CSS variable --rose = "' + _rose.trim() + '" — AVAILABLE');
-        } else {
-          console.warn('  ⚠ [FORENSIC] CSS variable --rose — NOT DEFINED ⚠️');
-        }
-        e('css-var-check',{roseAvailable:!!_rose});
-
-        /* Check fonts availability */
-        if(document.fonts) {
-          document.fonts.ready.then(function(){
-            console.log('%c  ✓ [FORENSIC] document.fonts.ready — all fonts loaded at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#27ae60');
-          });
-        }
-      });
-
-      window.addEventListener('load', function(){
-        e('window.load');
-        console.log('%c⏱ [FORENSIC] window.load event at +' + (performance.now()-_t0).toFixed(1) + 'ms', 'color:#f28b9e;font-weight:bold');
-      });
-    })();
-  </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"
-    onload="console.log('%c⏱ [FORENSIC] GSAP — LOADED at +' + (performance.now() - (window.__FORENSIC_T0||0)).toFixed(1) + 'ms', 'color:#f28b9e;font-weight:bold'); window.__FORENSIC_GSAP_LOADING = false;"
-    onerror="console.error('%c🚨 [FORENSIC] GSAP — FAILED TO LOAD', 'color:#c0392b;font-weight:bold');">
-  </script>
-  <script type="module" src="js/forensic.js"></script>
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

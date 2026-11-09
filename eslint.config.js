@@ -2,8 +2,12 @@ export default [
   {
     ignores: [
       'node_modules/',
+      'dist/',
+      'js/',
       'music/',
       'images/',
+      'public/music/',
+      'public/images/',
       '**/*.mp3',
       '**/*.webp',
     ],
@@ -25,6 +29,9 @@ export default [
         MediaMetadata: 'readonly',
         URL: 'readonly',
         console: 'readonly',
+        fetch: 'readonly',
+        performance: 'readonly',
+        MutationObserver: 'readonly',
         localStorage: 'readonly',
         getComputedStyle: 'readonly',
       },
