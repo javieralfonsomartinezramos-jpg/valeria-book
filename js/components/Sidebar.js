@@ -1,3 +1,18 @@
+console.log(`%c[FORENSIC] MODULE LOADED — js/components/Sidebar.js`, 'color:#27ae60;font-weight:bold');
+
+const _fB = () => window.__FORENSIC;
+const _fVT = () => `[${(performance.now() - (_fB()?.t0 || performance.now())).toFixed(2)}ms]`;
+const _fW = (fn, label, path) => function(...args) {
+  const _t0 = performance.now(); const _ts = () => `[${(performance.now() - (_fB()?.t0 || _t0)).toFixed(2)}ms]`;
+  console.groupCollapsed(`${_ts()} [FN] ${path} → ${label}`);
+  try {
+    const r = fn.apply(this, args);
+    if (r instanceof Promise) { r.then(v => { console.log(`${_ts()} [FN] ✓ ${label} — resolved in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); return v; }, e => { console.error(`${_ts()} [FN] 🚨 ${label} — rejected: ${e?.message||e}`); console.groupEnd(); throw e; }); }
+    else { console.log(`${_ts()} [FN] ✓ ${label} — completed in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); }
+    return r;
+  } catch(e) { console.error(`${_ts()} [FN] 🚨 ${label} — exception: ${e?.message||e}`); console.trace(); console.groupEnd(); throw e; }
+};
+
 import { CHAPTERS } from '../config.js';
 import { sanitize } from '../core/Utils.js';
 import { FocusTrap } from '../ui/FocusTrap.js';
@@ -11,25 +26,33 @@ let prevFocus = null;
 let sidebarEl = null;
 let btnIndex = null;
 
-function buildIndex() {
+function _f_buildIndex() {
+  console.log(`%c[FORENSIC] getElementById('index-list') — js/components/Sidebar.js`, 'color:#f28b9e;font-weight:bold');
   const list = document.getElementById('index-list');
+  if (list) { console.log(`%c[FORENSIC] getElementById('index-list') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('index-list') → NULL`, 'color:#e67e22;font-weight:bold'); }
   if (!list) return;
   list.innerHTML = CHAPTERS.map(ch => {
     const active = ch.spread === getCurrentSpread();
     return '<li><a href="#" data-spread="' + ch.spread + '" class="index-link' + (active ? ' active' : '') + '">' + sanitize(ch.name) + '</a></li>';
   }).join('');
 }
+const buildIndex = _fW(_f_buildIndex, 'buildIndex', 'js/components/Sidebar.js');
 
-function cleanup() {
+function _f_cleanup() {
   if (releaseFocus) { releaseFocus(); releaseFocus = null; }
   if (prevFocus) { prevFocus.focus(); prevFocus = null; }
 }
+const cleanup = _fW(_f_cleanup, 'cleanup', 'js/components/Sidebar.js');
 
 export class Sidebar {
   static init() {
     if (sidebarEl) return;
+    console.log(`%c[FORENSIC] getElementById('sidebar') — js/components/Sidebar.js`, 'color:#f28b9e;font-weight:bold');
     sidebarEl = document.getElementById('sidebar');
+    if (sidebarEl) { console.log(`%c[FORENSIC] getElementById('sidebar') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('sidebar') → NULL`, 'color:#e67e22;font-weight:bold'); }
+    console.log(`%c[FORENSIC] getElementById('btn-index') — js/components/Sidebar.js`, 'color:#f28b9e;font-weight:bold');
     btnIndex = document.getElementById('btn-index');
+    if (btnIndex) { console.log(`%c[FORENSIC] getElementById('btn-index') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('btn-index') → NULL`, 'color:#e67e22;font-weight:bold'); }
     if (!sidebarEl) { Logger.warn('Sidebar', 'sidebar not found'); return; }
 
     DOMManager.onClick('#sidebar-close', () => Sidebar.close());
@@ -46,7 +69,10 @@ export class Sidebar {
     if (sidebarOpen) {
       buildIndex();
       prevFocus = document.activeElement;
-      releaseFocus = FocusTrap.trap(sidebarEl, document.getElementById('sidebar-close'));
+      console.log(`%c[FORENSIC] getElementById('sidebar-close') — js/components/Sidebar.js`, 'color:#f28b9e;font-weight:bold');
+      const _sc = document.getElementById('sidebar-close');
+      if (_sc) { console.log(`%c[FORENSIC] getElementById('sidebar-close') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('sidebar-close') → NULL`, 'color:#e67e22;font-weight:bold'); }
+      releaseFocus = FocusTrap.trap(sidebarEl, _sc);
     } else {
       cleanup();
     }
@@ -59,3 +85,7 @@ export class Sidebar {
     cleanup();
   }
 }
+
+Sidebar.init = _fW(Sidebar.init.bind(Sidebar), 'init', 'js/components/Sidebar.js');
+Sidebar.toggle = _fW(Sidebar.toggle.bind(Sidebar), 'toggle', 'js/components/Sidebar.js');
+Sidebar.close = _fW(Sidebar.close.bind(Sidebar), 'close', 'js/components/Sidebar.js');

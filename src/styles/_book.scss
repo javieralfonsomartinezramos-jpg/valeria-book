@@ -1,0 +1,633 @@
+#app {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    linear-gradient(135deg, rgba(16, 23, 34, 0.94), rgba(36, 25, 24, 0.92) 52%, rgba(21, 16, 15, 0.98)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 9px);
+}
+
+#app::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.035), transparent 28%, transparent 70%, rgba(0,0,0,0.22)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 6px);
+  opacity: 0.78;
+}
+
+#app::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 120px rgba(0, 0, 0, 0.48),
+    inset 0 -18dvh 22dvh rgba(0, 0, 0, 0.25);
+}
+
+.ambient {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0 8%, rgba(229,199,141,0.045) 8% 8.2%, transparent 8.2% 91.8%, rgba(229,199,141,0.04) 91.8% 92%, transparent 92%),
+    linear-gradient(180deg, transparent, rgba(229,199,141,0.035) 50%, transparent);
+  opacity: 0.75;
+}
+
+.ambient-glow {
+  display: none;
+}
+
+/* ─── Book structural styles ──────────────────────────────────── */
+
+.book-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 2500px;
+  perspective-origin: 50% 40%;
+  padding: var(--space-lg) var(--space-sm);
+}
+
+.book-wrapper::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--space-lg) - 0.65rem);
+  width: min(78vw, 960px);
+  height: 42px;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.3);
+  filter: blur(20px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.book-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 18px 48px rgba(0,0,0,0.42));
+  transform-style: preserve-3d;
+}
+
+.book {
+  position: relative;
+  width: var(--page-w);
+  height: var(--page-h);
+  display: flex;
+  transform-style: preserve-3d;
+  border-radius: 10px 14px 14px 10px;
+  transform: rotateX(3deg) rotateY(0.5deg);
+  transition: transform 0.6s var(--ease-out);
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.32), transparent 7%, transparent 93%, rgba(0,0,0,0.22)),
+    linear-gradient(145deg, var(--wine-deep), var(--wine) 58%, #111823);
+  box-shadow:
+    0 22px 70px rgba(0,0,0,0.38),
+    0 0 0 1px rgba(229,199,141,0.16) inset;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.book-cover-front {
+  position: absolute;
+  inset: -7px;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.35) 0 8%, transparent 8%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 5px),
+    linear-gradient(135deg, var(--wine-deep), var(--wine));
+  border-radius: 11px 18px 18px 11px;
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 40px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(242, 139, 158, 0.15) inset,
+    0 1px 0 rgba(255,255,255,0.04) inset,
+    0 -1px 0 rgba(0,0,0,0.3) inset,
+    3px 0 8px rgba(0,0,0,0.2);
+  transform: translateZ(-8px);
+}
+
+.book-cover-front::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.03) 0%, transparent 20%,
+    transparent 80%, rgba(0,0,0,0.08) 100%);
+  pointer-events: none;
+}
+
+.cover-emboss {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  transform: translateZ(1px);
+}
+
+.cover-kicker {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--gold);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.cover-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--gold-light);
+  letter-spacing: 0.04em;
+}
+
+.cover-subtitle {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ─── Spine ────────────────────────────────────────────────────── */
+
+.spine {
+  position: absolute;
+  pointer-events: none;
+}
+
+.spine-center {
+  left: 50%;
+  width: 6px;
+  height: 100%;
+  transform: translateX(-50%) translateZ(3px);
+  background: linear-gradient(to bottom, var(--wine-deep), #2a0a14, var(--wine-deep));
+  box-shadow: -1px 0 4px rgba(0,0,0,0.3), 1px 0 4px rgba(0,0,0,0.3), 0 0 8px rgba(0,0,0,0.15) inset;
+  z-index: 15;
+  border-radius: 1px;
+}
+
+.spine-l, .spine-r {
+  width: 3px;
+  height: 100%;
+  opacity: 0.6;
+  z-index: 14;
+}
+
+.spine-l {
+  left: -1px;
+  background: linear-gradient(to right, transparent, rgba(0,0,0,0.15));
+}
+
+.spine-r {
+  right: -1px;
+  background: linear-gradient(to left, transparent, rgba(0,0,0,0.15));
+}
+
+.book-spread {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  z-index: 1;
+  padding: 7px;
+}
+
+.book-spread.active {
+  z-index: 2;
+  will-change: transform, opacity;
+}
+
+.book-page {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  transform: translateZ(0);
+  color: var(--page-ink);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.24), transparent 18%, transparent 82%, rgba(0,0,0,0.035)),
+    var(--page-bg);
+  box-shadow:
+    0 0 0 1px var(--page-line),
+    0 1px 0 rgba(255,255,255,0.38) inset,
+    0 -1px 0 rgba(0,0,0,0.05) inset;
+}
+
+.book-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    var(--paper-grain),
+    linear-gradient(90deg, rgba(0,0,0,0.055), transparent 11%, transparent 89%, rgba(0,0,0,0.035));
+  opacity: 0.72;
+  mix-blend-mode: multiply;
+  z-index: 0;
+}
+
+.book-page > div {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+}
+
+.book-page-left {
+  border-radius: 6px 2px 2px 6px;
+  background:
+    linear-gradient(90deg, var(--page-bg-alt), var(--page-bg) 12%),
+    var(--page-bg);
+  box-shadow:
+    -8px 0 18px rgba(0,0,0,0.08) inset,
+    -1px 0 0 rgba(255,255,255,0.35) inset,
+    0 0 0 1px var(--page-line);
+}
+
+.book-page-right {
+  border-radius: 2px 6px 6px 2px;
+  background:
+    linear-gradient(270deg, var(--page-bg-alt), var(--page-bg) 12%),
+    var(--page-bg);
+  box-shadow:
+    8px 0 18px rgba(0,0,0,0.07) inset,
+    1px 0 0 rgba(255,255,255,0.35) inset,
+    0 0 0 1px var(--page-line);
+}
+
+.book-shadow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.book-shadow::before {
+  content: '';
+  position: absolute;
+  inset: -4px -8px -18px -8px;
+  background: radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.18) 40%, transparent 70%);
+}
+
+.book-shadow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: 0 2px 40px rgba(0,0,0,0.45), 0 0 80px rgba(0,0,0,0.12);
+}
+
+/* ─── Page slots ──────────────────────────────────────────────── */
+
+.page-slot {
+  flex: 1;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  transition: visibility 0.01s;
+  transform-style: preserve-3d;
+}
+
+.ps-left {
+  transform-origin: right center;
+}
+
+.ps-right {
+  transform-origin: left center;
+}
+
+.book.flipping .page-slot {
+  visibility: hidden;
+}
+
+.page-surf {
+  width: 100%;
+  height: 100%;
+  background: var(--page-bg);
+  color: var(--page-ink);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 0 1px var(--page-line), 0 0 0 1px rgba(44,24,16,0.06) inset;
+  overflow: hidden;
+}
+
+.page-surf::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--paper-grain);
+  opacity: 0.6;
+  mix-blend-mode: multiply;
+}
+
+.ps-left .page-surf {
+  border-radius: 6px 0 0 6px;
+  background:
+    radial-gradient(ellipse at 100% 50%, rgba(0,0,0,0.015) 0%, transparent 70%),
+    linear-gradient(90deg, var(--page-bg-alt) 0%, var(--page-bg) 10%);
+}
+
+.ps-right .page-surf {
+  border-radius: 0 6px 6px 0;
+  background:
+    radial-gradient(ellipse at 0% 50%, rgba(0,0,0,0.015) 0%, transparent 70%),
+    linear-gradient(270deg, var(--page-bg-alt) 0%, var(--page-bg) 10%);
+}
+
+.pg-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-md);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(143,71,60,0.42) transparent;
+}
+
+.pg-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.pg-body::-webkit-scrollbar-thumb {
+  background: rgba(143,71,60,0.42);
+  border-radius: 999px;
+}
+
+.pg-body > .content-enter {
+  animation: contentEnter 0.4s var(--ease-out) both;
+}
+
+.pg-body > .content-enter > * {
+  animation: contentEnter 0.35s var(--ease-out) both;
+}
+
+.pg-body > .content-enter > *:nth-child(1) { animation-delay: 0.02s; }
+.pg-body > .content-enter > *:nth-child(2) { animation-delay: 0.06s; }
+.pg-body > .content-enter > *:nth-child(3) { animation-delay: 0.10s; }
+.pg-body > .content-enter > *:nth-child(4) { animation-delay: 0.14s; }
+.pg-body > .content-enter > *:nth-child(5) { animation-delay: 0.18s; }
+.pg-body > .content-enter > *:nth-child(6) { animation-delay: 0.22s; }
+.pg-body > .content-enter > *:nth-child(7) { animation-delay: 0.26s; }
+
+.pg-body > div {
+  min-height: 100%;
+}
+
+.pg-num {
+  position: absolute;
+  bottom: var(--space-sm);
+  font-size: var(--text-xs);
+  color: var(--page-muted);
+  font-family: var(--font-serif);
+}
+
+.ps-left .pg-num {
+  right: var(--space-md);
+}
+
+.ps-right .pg-num {
+  left: var(--space-md);
+}
+
+/* ─── Flip page — cinematic 3D ────────────────────────────────── */
+
+.flip-page {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.dir-right {
+  transform-origin: left center;
+}
+
+.dir-left {
+  transform-origin: right center;
+}
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  background: var(--page-bg);
+  overflow: hidden;
+}
+
+.f-front {
+  z-index: 2;
+  border-radius: 6px 0 0 6px;
+  box-shadow: -2px 0 12px rgba(0,0,0,0.08) inset, 0 1px 3px rgba(0,0,0,0.05);
+  background: linear-gradient(90deg, transparent 0%, rgba(242,139,158,0.02) 100%), var(--page-bg);
+}
+
+.f-back {
+  z-index: 1;
+  transform: rotateY(180deg);
+  border-radius: 0 6px 6px 0;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.08) inset, 0 1px 3px rgba(0,0,0,0.05);
+  background: linear-gradient(270deg, transparent 0%, rgba(242,139,158,0.02) 100%), var(--page-bg);
+}
+
+.dir-right .f-front {
+  border-radius: 6px 0 0 6px;
+}
+
+.dir-right .f-back {
+  border-radius: 0 6px 6px 0;
+}
+
+.dir-left .f-front {
+  border-radius: 0 6px 6px 0;
+  transform-origin: right center;
+}
+
+.dir-left .f-back {
+  border-radius: 6px 0 0 6px;
+}
+
+.flip-shadow {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(0,0,0,0.2), transparent);
+  opacity: 0;
+}
+
+.fold-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(to left, rgba(255,255,255,0.2), transparent);
+  opacity: 0;
+}
+
+.dir-right .flip-shadow {
+  background: linear-gradient(to right, rgba(0,0,0,0.22), transparent);
+}
+
+.dir-left .flip-shadow {
+  background: linear-gradient(to left, rgba(0,0,0,0.22), transparent);
+}
+
+/* ─── Book edges ──────────────────────────────────────────────── */
+
+.book-edge-left, .book-edge-right {
+  width: 24px;
+  height: 100%;
+  position: relative;
+  pointer-events: none;
+}
+
+.book-edge-left {
+  margin-right: -12px;
+  z-index: 0;
+}
+
+.book-edge-right {
+  margin-left: -12px;
+  z-index: 0;
+}
+
+.edge-pages {
+  width: 100%;
+  height: 100%;
+  background:
+    repeating-linear-gradient(90deg, transparent 0px, transparent 1.5px, rgba(0,0,0,0.025) 1.5px, rgba(0,0,0,0.025) 2.5px),
+    linear-gradient(180deg, rgba(0,0,0,0.04) 0%, transparent 4%, transparent 96%, rgba(0,0,0,0.04) 100%);
+  box-shadow: inset 0 0 12px rgba(0,0,0,0.1), 0 2px 16px rgba(0,0,0,0.08);
+}
+
+.book-edge-left .edge-pages {
+  border-radius: 3px 0 0 3px;
+}
+
+.book-edge-right .edge-pages {
+  border-radius: 0 3px 3px 0;
+}
+
+/* ─── Navigation buttons ──────────────────────────────────────── */
+
+.book-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 25;
+  width: 40px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  transition: color var(--dur), transform var(--dur);
+  border-radius: 6px;
+  opacity: 0.6;
+}
+
+.book-nav:hover {
+  color: var(--rose);
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.book-nav-prev {
+  left: calc(50% - var(--page-w) / 2 - 52px);
+}
+
+.book-nav-next {
+  right: calc(50% - var(--page-w) / 2 - 52px);
+}
+
+/* ─── Bookmark progress bar ───────────────────────────────────── */
+
+.bookmark {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 100;
+  background: rgba(242, 139, 158, 0.15);
+}
+
+.bookmark-ribbon {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--rose), var(--coral));
+  transition: width 0.4s var(--ease-out);
+}
+
+/* ─── Top bar ─────────────────────────────────────────────────── */
+
+#topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-lg);
+  background: linear-gradient(to bottom, rgba(15,10,13,0.95), transparent);
+  pointer-events: none;
+}
+
+.topbar-title {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+#topbar:not([hidden]) .topbar-title {
+  opacity: 1;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: var(--space-xxs);
+  pointer-events: auto;
+}
+
+.top-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--muted);
+  transition: background var(--dur), color var(--dur);
+}
+
+.top-btn:hover {
+  background: var(--rose-glow);
+  color: var(--rose);
+}

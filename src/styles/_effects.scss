@@ -1,0 +1,33 @@
+.particle-field {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  font-family: var(--font-serif);
+  color: var(--rose);
+  user-select: none;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.close-petals {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.petal {
+  position: absolute;
+  top: -10%;
+  color: var(--rose);
+  opacity: 0.3;
+  animation: petalFall linear infinite;
+  will-change: transform;
+}

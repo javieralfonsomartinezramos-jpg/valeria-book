@@ -1,10 +1,26 @@
+console.log(`%c[FORENSIC] MODULE LOADED — js/managers/ImageManager.js`, 'color:#27ae60;font-weight:bold');
+
+const _fB = () => window.__FORENSIC;
+const _fVT = () => `[${(performance.now() - (_fB()?.t0 || performance.now())).toFixed(2)}ms]`;
+const _fW = (fn, label, path) => function(...args) {
+  const _t0 = performance.now(); const _ts = () => `[${(performance.now() - (_fB()?.t0 || _t0)).toFixed(2)}ms]`;
+  console.groupCollapsed(`${_ts()} [FN] ${path} → ${label}`);
+  try {
+    const r = fn.apply(this, args);
+    if (r instanceof Promise) { r.then(v => { console.log(`${_ts()} [FN] ✓ ${label} — resolved in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); return v; }, e => { console.error(`${_ts()} [FN] 🚨 ${label} — rejected: ${e?.message||e}`); console.groupEnd(); throw e; }); }
+    else { console.log(`${_ts()} [FN] ✓ ${label} — completed in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); }
+    return r;
+  } catch(e) { console.error(`${_ts()} [FN] 🚨 ${label} — exception: ${e?.message||e}`); console.trace(); console.groupEnd(); throw e; }
+};
+
 import { CFG, IMAGES, IMAGE_CAPTIONS } from '../config.js';
 import { allowGesture } from '../core/gesture.js';
 
 let imgData = null;
 let openFn = null;
 
-export function setLightboxOpenFn(fn) { openFn = fn; }
+function _f_setLightboxOpenFn(fn) { openFn = fn; }
+export const setLightboxOpenFn = _fW(_f_setLightboxOpenFn, 'setLightboxOpenFn', 'js/managers/ImageManager.js');
 
 export class ImageManager {
   static init() {
@@ -88,3 +104,11 @@ export class ImageManager {
     });
   }
 }
+
+ImageManager.init = _fW(ImageManager.init.bind(ImageManager), 'init', 'js/managers/ImageManager.js');
+ImageManager.getData = _fW(ImageManager.getData.bind(ImageManager), 'getData', 'js/managers/ImageManager.js');
+ImageManager.getCount = _fW(ImageManager.getCount.bind(ImageManager), 'getCount', 'js/managers/ImageManager.js');
+ImageManager.getImage = _fW(ImageManager.getImage.bind(ImageManager), 'getImage', 'js/managers/ImageManager.js');
+ImageManager.createElement = _fW(ImageManager.createElement.bind(ImageManager), 'createElement', 'js/managers/ImageManager.js');
+ImageManager.loadImage = _fW(ImageManager.loadImage.bind(ImageManager), 'loadImage', 'js/managers/ImageManager.js');
+ImageManager.destroyImage = _fW(ImageManager.destroyImage.bind(ImageManager), 'destroyImage', 'js/managers/ImageManager.js');

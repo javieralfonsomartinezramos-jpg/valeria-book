@@ -1,0 +1,125 @@
+.music-dock {
+  position: fixed;
+  right: clamp(0.75rem, 2vw, 1.5rem);
+  bottom: calc(env(safe-area-inset-bottom) + 1rem);
+  z-index: 70;
+  width: min(330px, calc(100vw - 1.5rem));
+  max-height: min(42dvh, 360px);
+  color: var(--page-ink);
+  filter: drop-shadow(0 16px 34px rgba(0,0,0,0.35));
+}
+
+.music-dock:not(.is-expanded) .mp-queue {
+  display: none;
+}
+
+.music-dock:not(.is-expanded) .mp-prog-wrap,
+.music-dock:not(.is-expanded) .mp-vol-wrap {
+  display: none;
+}
+
+.music-dock:not(.is-expanded) .mp-extra-row {
+  border-bottom: 0;
+  padding-block: 0.35rem;
+}
+
+.music-dock-toggle {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.75rem;
+  z-index: 2;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(143,71,60,0.14);
+  border-radius: 50%;
+  color: var(--page-accent);
+  background: rgba(255,255,255,0.22);
+  font-family: var(--font-sans);
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.music-dock-toggle:hover {
+  background: rgba(143,71,60,0.1);
+}
+
+.music-dock .mp-now {
+  padding-right: 3.2rem;
+}
+
+.music-dock[hidden] {
+  display: none;
+}
+
+.music-dock .p-music {
+  height: auto;
+  max-height: inherit;
+  overflow: hidden;
+  border: 1px solid rgba(229,199,141,0.42);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(250,241,222,0.98), rgba(226,210,183,0.98));
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.18) inset;
+  backdrop-filter: blur(18px);
+  position: relative;
+}
+
+.music-dock .p-music::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--page-accent-soft), transparent);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.music-dock .mp-now {
+  padding: 0.75rem 0.85rem;
+}
+
+.music-dock .mp-queue {
+  max-height: 170px;
+}
+
+@media (max-width: 639px) {
+  .music-dock:not([hidden]) ~ .book-wrapper {
+    transform: translateY(-2.35rem);
+  }
+
+  .music-dock {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
+    width: auto;
+  }
+
+  .music-dock .mp-queue {
+    display: none;
+  }
+
+  .music-dock.is-expanded .mp-queue {
+    display: block;
+    max-height: 150px;
+  }
+
+  .music-dock .mp-vol-wrap {
+    display: none;
+  }
+
+  .music-dock .mp-extra-row {
+    gap: 0.45rem;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .music-dock:not([hidden]) ~ .book-wrapper {
+    transform: translateY(-1.25rem);
+  }
+
+  .music-dock {
+    right: 1rem;
+    bottom: calc(env(safe-area-inset-bottom) + 0.8rem);
+  }
+}

@@ -1,3 +1,18 @@
+console.log(`%c[FORENSIC] MODULE LOADED — js/services/AudioManager.js`, 'color:#27ae60;font-weight:bold');
+
+const _fB = () => window.__FORENSIC;
+const _fVT = () => `[${(performance.now() - (_fB()?.t0 || performance.now())).toFixed(2)}ms]`;
+const _fW = (fn, label, path) => function(...args) {
+  const _t0 = performance.now(); const _ts = () => `[${(performance.now() - (_fB()?.t0 || _t0)).toFixed(2)}ms]`;
+  console.groupCollapsed(`${_ts()} [FN] ${path} → ${label}`);
+  try {
+    const r = fn.apply(this, args);
+    if (r instanceof Promise) { r.then(v => { console.log(`${_ts()} [FN] ✓ ${label} — resolved in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); return v; }, e => { console.error(`${_ts()} [FN] 🚨 ${label} — rejected: ${e?.message||e}`); console.groupEnd(); throw e; }); }
+    else { console.log(`${_ts()} [FN] ✓ ${label} — completed in ${(performance.now()-_t0).toFixed(2)}ms`); console.groupEnd(); }
+    return r;
+  } catch(e) { console.error(`${_ts()} [FN] 🚨 ${label} — exception: ${e?.message||e}`); console.trace(); console.groupEnd(); throw e; }
+};
+
 import { EventBus } from '../core/EventBus.js';
 import { Logger } from '../core/Logger.js';
 import { StorageManager } from '../core/StorageManager.js';
@@ -29,22 +44,40 @@ export class AudioManager {
   static init() {
     if (inited) return;
     inited = true;
+    console.log(`%c[FORENSIC] getElementById('audio') — js/services/AudioManager.js`, 'color:#f28b9e;font-weight:bold');
     audio = document.getElementById('audio');
+    if (audio) { console.log(`%c[FORENSIC] getElementById('audio') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('audio') → NULL`, 'color:#e67e22;font-weight:bold'); }
     if (!audio) { Logger.warn('AudioManager', 'Audio element not found'); return; }
     bindAudioEvents();
     restoreState();
-    setupMediaSession();
+    AudioManager.setupMediaSession();
   }
 
   static refreshUI() {
+    console.log(`%c[FORENSIC] getElementById('mp-prog') — js/services/AudioManager.js`, 'color:#f28b9e;font-weight:bold');
     progEl = document.getElementById('mp-prog');
+    if (progEl) { console.log(`%c[FORENSIC] getElementById('mp-prog') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('mp-prog') → NULL`, 'color:#e67e22;font-weight:bold'); }
+    console.log(`%c[FORENSIC] getElementById('mp-cur') — js/services/AudioManager.js`, 'color:#f28b9e;font-weight:bold');
     curEl = document.getElementById('mp-cur');
+    if (curEl) { console.log(`%c[FORENSIC] getElementById('mp-cur') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('mp-cur') → NULL`, 'color:#e67e22;font-weight:bold'); }
+    console.log(`%c[FORENSIC] getElementById('mp-tot') — js/services/AudioManager.js`, 'color:#f28b9e;font-weight:bold');
     totEl = document.getElementById('mp-tot');
+    if (totEl) { console.log(`%c[FORENSIC] getElementById('mp-tot') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('mp-tot') → NULL`, 'color:#e67e22;font-weight:bold'); }
+    console.log(`%c[FORENSIC] getElementById('mp-track') — js/services/AudioManager.js`, 'color:#f28b9e;font-weight:bold');
     trackEl = document.getElementById('mp-track');
+    if (trackEl) { console.log(`%c[FORENSIC] getElementById('mp-track') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('mp-track') → NULL`, 'color:#e67e22;font-weight:bold'); }
+    console.log(`%c[FORENSIC] getElementById('mp-artist') — js/services/AudioManager.js`, 'color:#f28b9e;font-weight:bold');
     artistEl = document.getElementById('mp-artist');
+    if (artistEl) { console.log(`%c[FORENSIC] getElementById('mp-artist') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('mp-artist') → NULL`, 'color:#e67e22;font-weight:bold'); }
+    console.log(`%c[FORENSIC] getElementById('mp-play') — js/services/AudioManager.js`, 'color:#f28b9e;font-weight:bold');
     playBtnEl = document.getElementById('mp-play');
+    if (playBtnEl) { console.log(`%c[FORENSIC] getElementById('mp-play') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('mp-play') → NULL`, 'color:#e67e22;font-weight:bold'); }
+    console.log(`%c[FORENSIC] getElementById('mp-picon') — js/services/AudioManager.js`, 'color:#f28b9e;font-weight:bold');
     piconEl = document.getElementById('mp-picon');
+    if (piconEl) { console.log(`%c[FORENSIC] getElementById('mp-picon') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('mp-picon') → NULL`, 'color:#e67e22;font-weight:bold'); }
+    console.log(`%c[FORENSIC] getElementById('mp-eq') — js/services/AudioManager.js`, 'color:#f28b9e;font-weight:bold');
     eqEl = document.getElementById('mp-eq');
+    if (eqEl) { console.log(`%c[FORENSIC] getElementById('mp-eq') → FOUND`, 'color:#27ae60;font-weight:bold'); } else { console.warn(`%c[FORENSIC] ⚠ getElementById('mp-eq') → NULL`, 'color:#e67e22;font-weight:bold'); }
     updatePlayBtn();
   }
 
@@ -73,7 +106,7 @@ export class AudioManager {
       isLoading = false;
       errorSkips = 0;
       if (loadTimer) { clearTimeout(loadTimer); loadTimer = 0; }
-      updateUI();
+      AudioManager.updateUI();
       debounceSave();
     }).catch(() => {
       isLoading = false;
@@ -151,6 +184,23 @@ export class AudioManager {
   }
 }
 
+AudioManager.init = _fW(AudioManager.init.bind(AudioManager), 'init', 'js/services/AudioManager.js');
+AudioManager.refreshUI = _fW(AudioManager.refreshUI.bind(AudioManager), 'refreshUI', 'js/services/AudioManager.js');
+AudioManager.destroy = _fW(AudioManager.destroy.bind(AudioManager), 'destroy', 'js/services/AudioManager.js');
+AudioManager.play = _fW(AudioManager.play.bind(AudioManager), 'play', 'js/services/AudioManager.js');
+AudioManager.toggle = _fW(AudioManager.toggle.bind(AudioManager), 'toggle', 'js/services/AudioManager.js');
+AudioManager.prev = _fW(AudioManager.prev.bind(AudioManager), 'prev', 'js/services/AudioManager.js');
+AudioManager.next = _fW(AudioManager.next.bind(AudioManager), 'next', 'js/services/AudioManager.js');
+AudioManager.setVolume = _fW(AudioManager.setVolume.bind(AudioManager), 'setVolume', 'js/services/AudioManager.js');
+AudioManager.toggleMute = _fW(AudioManager.toggleMute.bind(AudioManager), 'toggleMute', 'js/services/AudioManager.js');
+AudioManager.seek = _fW(AudioManager.seek.bind(AudioManager), 'seek', 'js/services/AudioManager.js');
+AudioManager.getCurrentIdx = _fW(AudioManager.getCurrentIdx.bind(AudioManager), 'getCurrentIdx', 'js/services/AudioManager.js');
+AudioManager.getVolume = _fW(AudioManager.getVolume.bind(AudioManager), 'getVolume', 'js/services/AudioManager.js');
+AudioManager.getIsPlaying = _fW(AudioManager.getIsPlaying.bind(AudioManager), 'getIsPlaying', 'js/services/AudioManager.js');
+AudioManager.getIsMuted = _fW(AudioManager.getIsMuted.bind(AudioManager), 'getIsMuted', 'js/services/AudioManager.js');
+AudioManager.setupMediaSession = _fW(AudioManager.setupMediaSession.bind(AudioManager), 'setupMediaSession', 'js/services/AudioManager.js');
+AudioManager.updateUI = _fW(AudioManager.updateUI.bind(AudioManager), 'updateUI', 'js/services/AudioManager.js');
+
 function bindAudioEvents() {
   if (!audio) return;
   var self = AudioManager;
@@ -179,7 +229,7 @@ function bindAudioEvents() {
 function rafLoop() {
   if (!audio) return;
   if (audio.duration) {
-    var pct = (audio.currentTime / audio.duration) * 100;
+    let pct = (audio.currentTime / audio.duration) * 100;
     if (progEl) progEl.value = String(pct);
     if (curEl) curEl.textContent = fmtTime(audio.currentTime);
     if (totEl) totEl.textContent = fmtTime(audio.duration);
@@ -206,7 +256,7 @@ function debounceSave() {
 }
 
 function saveState() {
-  var state = {
+  let state = {
     idx: currentIdx,
     time: audio ? audio.currentTime : 0,
     vol: savedVol || (audio ? audio.volume : 1),
@@ -217,10 +267,10 @@ function saveState() {
 }
 
 function restoreState() {
-  var state = StorageManager.loadMusic();
+  let state = StorageManager.loadMusic();
   if (state.idx < 0 || state.idx >= MUSIC.length || !audio) return;
   currentIdx = state.idx;
-  var restoredVol = Math.min(Math.max(state.vol, 0), 1);
+  let restoredVol = Math.min(Math.max(state.vol, 0), 1);
   savedVol = restoredVol > 0 ? restoredVol : 1;
   isMuted = !!state.muted;
   audio.volume = isMuted ? 0 : restoredVol;
@@ -229,7 +279,7 @@ function restoreState() {
   if (state.time > 0) {
     audio.src = CFG.musicDir + encodeURIComponent(MUSIC[state.idx]);
     audio.addEventListener('loadedmetadata', function handler() {
-      var savedTime = state.time || 0;
+      let savedTime = state.time || 0;
       if (savedTime > 0 && audio && audio.duration) {
         audio.currentTime = Math.min(savedTime, Math.max(audio.duration - 0.25, 0));
       }
