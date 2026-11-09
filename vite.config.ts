@@ -10,6 +10,9 @@ export default defineConfig({
     minify: 'esbuild',
     target: 'es2020',
   },
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
   css: {
     preprocessorOptions: {
       scss: {
