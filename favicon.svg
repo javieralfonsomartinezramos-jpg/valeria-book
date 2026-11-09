@@ -6,5 +6,5 @@
     </radialGradient>
   </defs>
   <rect width="64" height="64" rx="12" fill="url(#bg)"/>
-  <text x="32" y="42" text-anchor="middle" font-size="34" fill="#e8b4a8" font-family="serif">&hearts;</text>
+  <text x="32" y="42" text-anchor="middle" font-size="34" fill="#e8b4a8" font-family="serif">&#9829;</text>
 </svg>
