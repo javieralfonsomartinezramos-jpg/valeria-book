@@ -16,6 +16,7 @@ let loadTimer: ReturnType<typeof setTimeout> | null = null;
 let isLoading = false;
 let errorSkips = 0;
 let inited = false;
+let pendingRestore: MusicState | null = null;
 
 let progEl: HTMLInputElement | null = null;
 let curEl: HTMLElement | null = null;
@@ -103,18 +104,7 @@ function restoreState(): void {
   savedVol = restoredVol > 0 ? restoredVol : 1;
   isMuted = !!state.muted;
   audio.volume = isMuted ? 0 : restoredVol;
-
-  if (state.time > 0) {
-    audio.src = CFG.musicDir + encodeURIComponent(MUSIC[state.idx].file);
-    audio.addEventListener('loadedmetadata', function handler() {
-      const savedTime = state.time || 0;
-      if (savedTime > 0 && audio && audio.duration) {
-        audio.currentTime = Math.min(savedTime, Math.max(audio.duration - 0.25, 0));
-      }
-      if (audio) audio.removeEventListener('loadedmetadata', handler);
-    }, { once: true });
-    audio.load();
-  }
+  pendingRestore = state;
 }
 
 function updatePlayBtn(): void {
@@ -175,6 +165,7 @@ export class AudioManager {
     piconEl = document.getElementById('mp-picon');
     eqEl = document.getElementById('mp-eq');
     updatePlayBtn();
+    updateNowPlaying();
   }
 
   static destroy(): void {
@@ -191,6 +182,16 @@ export class AudioManager {
     if (!fromError) errorSkips = 0;
     currentIdx = idx;
     audio.src = CFG.musicDir + encodeURIComponent(MUSIC[idx].file);
+    const restoreTime = pendingRestore?.idx === idx ? pendingRestore.time : 0;
+    pendingRestore = null;
+    if (restoreTime > 0) {
+      audio.addEventListener('loadedmetadata', function handler() {
+        if (audio && audio.duration) {
+          audio.currentTime = Math.min(restoreTime, Math.max(audio.duration - 0.25, 0));
+        }
+        audio?.removeEventListener('loadedmetadata', handler);
+      }, { once: true });
+    }
     audio.load();
     isLoading = true;
     if (loadTimer) clearTimeout(loadTimer);
@@ -213,7 +214,10 @@ export class AudioManager {
 
   static toggle(): void {
     if (!audio) return;
-    if (!audio.src && MUSIC.length > 0) { AudioManager.play(0); return; }
+    if (!audio.src && MUSIC.length > 0) {
+      AudioManager.play(currentIdx >= 0 ? currentIdx : 0);
+      return;
+    }
     if (isPlaying) { audio.pause(); }
     else { audio.play().catch(() => {}); }
   }

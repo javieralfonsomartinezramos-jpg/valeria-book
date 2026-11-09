@@ -14,15 +14,20 @@ const _fW = <TArgs extends unknown[], TReturn>(fn: (...args: TArgs) => TReturn, 
 };
 
 import './styles/main.scss';
-import { gsap } from 'gsap';
 
 import { Portal } from './components/Portal.js';
 import { StartupManager } from './managers/StartupManager.js';
 
-// La aplicación usa GSAP de forma opcional en los componentes de portada y
-// de cambio de página. Registrarlo aquí evita que el libro caiga siempre en
-// la navegación instantánea cuando se ejecuta con Vite.
-window.gsap = gsap;
+let animationLoad: Promise<void> | null = null;
+
+function loadAnimations(): Promise<void> {
+  if (!animationLoad) {
+    animationLoad = import('gsap')
+      .then(({ gsap }) => { window.gsap = gsap; })
+      .catch(() => undefined);
+  }
+  return animationLoad;
+}
 
 function _f_init(): void {
   Portal.init();
@@ -34,7 +39,8 @@ function _f_init(): void {
     console.warn(`%c[FORENSIC] ⚠ getElementById('portal-btn') → NULL`, 'color:#e67e22;font-weight:bold');
   }
   if (btn) {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
+      await loadAnimations();
       Portal.close();
       StartupManager.start();
     }, { once: true });

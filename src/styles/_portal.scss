@@ -206,6 +206,8 @@
   .portal-book-cover {
     width: min(94vw, 390px);
     min-height: min(86dvh, 600px);
+    max-height: calc(100dvh - 1.25rem);
+    grid-template-rows: minmax(150px, 30%) 1fr;
     transform: none;
   }
 
@@ -215,6 +217,12 @@
 
   .portal-cover-photo {
     margin: 18px 18px 0 42px;
+  }
+
+  .portal-cover-photo img {
+    transform: scale(1.28);
+    transform-origin: center 72%;
+    object-position: center 72%;
   }
 
   .portal-cover-copy {
